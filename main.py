@@ -21,6 +21,7 @@ def gui():
 
 if __name__ == '__main__':
     importer.importCSV()
-    importer.convertToPandasDF()
+    #importer.convertToPandasDF()
+    importer.getDict()
     # root.mainloop()
 
