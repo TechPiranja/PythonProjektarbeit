@@ -18,5 +18,5 @@ class Importer:
     def getNumpyArr(self):
         print(self.dataFrame.to_numpy())
 
-    def getDataframe(self):
+    def getDataFrame(self):
         print(self.dataFrame)
