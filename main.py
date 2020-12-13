@@ -15,6 +15,9 @@ def openFileDialog():
 def deleteSelectedFiles():
     selectedFiles.delete(1.0, END)
 
+def getSelectedFiles():
+    return selectedFiles.get(1.0, END)
+
 h1 = Label(root, text="Datendateien")
 h1.pack()
 open_btn = Button(root, text="Datendateien öffnen", command=openFileDialog)
