@@ -14,15 +14,16 @@ pt = Table(frame2)
 
 def openFileDialog():
     files = list(askopenfilenames(parent=root, title='Choose a file'))
-    selectedFiles.insert(END, files) # TODO: import without {} brackets
     updateDf(files)
 
 def updateDf(files: list):
     # TODO use CSV Merge Method ( not implemented yet )
+    selectedFiles.insert(END, files)  # TODO: import without {} brackets
+    encodingText.insert(1.0, detector.detectEncoding(files[0]))
+
     importer.importCSV(files[0])
     updatedDataframe = importer.getDataFrame()
     print("has Header: " + str(detector.detectHeader(files[0])))
-    print("Encoding: " + str(detector.detectEncoding(files[0])))
     pt.updateModel(TableModel(updatedDataframe))
     pt.redraw()
 
@@ -42,6 +43,10 @@ deleteAll_btn.pack(padx=5, pady=10, side=LEFT)
 selectedFiles = Text(frame1, height=5)
 selectedFiles.config(bg='grey')
 selectedFiles.pack()
+encoding = Label(frame1, text="CSV-Zeichenkodierung:")
+encoding.pack()
+encodingText = Text(frame1, height=1)
+encodingText.pack()
 frame1.pack(pady=10, padx=5)
 
 vorschau = Label(root, text="Vorschau")
