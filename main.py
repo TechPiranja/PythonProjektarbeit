@@ -2,6 +2,7 @@ from tkinter import *
 from importer import Importer
 from tkinter.filedialog import askopenfilenames
 from pandastable import Table, TableModel
+import detector
 
 importer = Importer()
 
@@ -19,7 +20,10 @@ def openFileDialog():
 def updateDf(files: list):
     # TODO use CSV Merge Method ( not implemented yet )
     importer.importCSV(files[0])
-    pt.updateModel(TableModel(importer.getDataFrame()))
+    updatedDataframe = importer.getDataFrame()
+    print("has Header: " + str(detector.detectHeader(files[0])))
+    print("Encoding: " + str(detector.detectEncoding(files[0])))
+    pt.updateModel(TableModel(updatedDataframe))
     pt.redraw()
 
 def deleteSelectedFiles():
