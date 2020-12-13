@@ -5,9 +5,9 @@ import pandas as pd
 class Importer:
     dataFrame: pd.DataFrame
 
-    def importCSV(self):
+    def importCSV(self, file: str):
         # TODO: this is just for testing, delete this!
-        self.dataFrame = pd.read_csv(r'./testFiles/10000 Sales Records.csv')
+        self.dataFrame = pd.read_csv(file)
 
     # def convertToList(self):
     #

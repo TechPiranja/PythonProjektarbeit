@@ -1,16 +1,26 @@
 from tkinter import *
 from importer import Importer
 from tkinter.filedialog import askopenfilenames
-from pandastable import Table
+from pandastable import Table, TableModel
 
 importer = Importer()
-importer.importCSV()
 
 root = Tk()
 root.title("Tabelle importieren")
+frame1 = Frame(root)
+frame2 = Frame(root)
+pt = Table(frame2)
 
 def openFileDialog():
-    selectedFiles.insert(END, (list(askopenfilenames(parent=root, title='Choose a file'))))
+    files = list(askopenfilenames(parent=root, title='Choose a file'))
+    selectedFiles.insert(END, files) # TODO: import without {} brackets
+    updateDf(files)
+
+def updateDf(files: list):
+    # TODO use CSV Merge Method ( not implemented yet )
+    importer.importCSV(files[0])
+    pt.updateModel(TableModel(importer.getDataFrame()))
+    pt.redraw()
 
 def deleteSelectedFiles():
     selectedFiles.delete(1.0, END)
@@ -18,8 +28,6 @@ def deleteSelectedFiles():
 def getSelectedFiles():
     return selectedFiles.get(1.0, END)
 
-frame1 = Frame(root)
-frame2 = Frame(root)
 
 h1 = Label(frame1, text="Datendateien")
 h1.pack()
@@ -32,11 +40,8 @@ selectedFiles.config(bg='grey')
 selectedFiles.pack()
 frame1.pack(pady=10, padx=5)
 
-
 vorschau = Label(root, text="Vorschau")
 vorschau.pack()
-dataframe = importer.getDataFrame()
-pt = Table(frame2, dataframe=dataframe)
 pt.show()
 frame2.pack(side=LEFT)
 
