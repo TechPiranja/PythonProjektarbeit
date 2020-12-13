@@ -19,4 +19,4 @@ class Importer:
         print(self.dataFrame.to_numpy())
 
     def getDataFrame(self):
-        print(self.dataFrame)
+        return self.dataFrame
