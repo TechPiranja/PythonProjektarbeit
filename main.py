@@ -9,7 +9,6 @@ importer = Importer()
 root = Tk()
 root.title("Tabelle importieren")
 frame1 = Frame(root)
-detectorFrame = Frame(root)
 frame2 = Frame(root)
 pt = Table(frame2)
 
@@ -40,24 +39,29 @@ h1.pack(expand=TRUE, fill="x")
 
 buttonFrame = Frame(frame1)
 open_btn = Button(buttonFrame, text="Datendateien öffnen", command=openFileDialog)
-open_btn.pack(padx=5, side=TOP, fill="x")
+open_btn.pack(side=TOP, fill="x")
 deleteAll_btn = Button(buttonFrame, text="Alle entfernen", command=deleteSelectedFiles)
-deleteAll_btn.pack(padx=5, side=BOTTOM, fill="x")
+deleteAll_btn.pack(side=BOTTOM, fill="x")
 buttonFrame.pack(side=LEFT)
 
 dialogFrame = Frame(frame1)
-selectedFiles = Text(dialogFrame, height=4)
-selectedFiles.config(bg='#eee')
+selectedFiles = Text(dialogFrame, height=4, borderwidth=2, relief=SUNKEN)
 selectedFiles.pack(fill="y")
 frame1.pack(pady=10, padx=5, fill="x")
 dialogFrame.pack(expand=True, fill="x")
 
-encoding = Label(detectorFrame, text="CSV-Zeichenkodierung:")
-encoding.pack(side=LEFT, padx=5)
-encodingText = Text(detectorFrame, height=1)
-encodingText.pack(side=LEFT, fill="both", expand=TRUE)
-detectorFrame.pack(fill="x")
+#Detector Frame
+detectorFrame = Frame(root)
 
+encoding = Label(detectorFrame, text="CSV-Zeichenkodierung:", width=20, anchor="w", justify="left").grid(row=0, column=0)
+encodingText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN).grid(row=0, column=1)
+
+hasHeaderLabel = Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left").grid(row=1, column=0)
+hasHeaderText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN).grid(row=1, column=1)
+
+detectorFrame.pack(fill="x", padx=5)
+
+#Vorschau und Pandastable
 vorschau = Label(root, text="Vorschau", bg="#eee")
 vorschau.pack(expand=TRUE, fill="x", padx=5, side=TOP)
 pt.show()
