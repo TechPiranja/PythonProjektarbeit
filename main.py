@@ -37,26 +37,23 @@ def getSelectedFiles():
 h1 = Label(frame1, text="Datendateien", bg="#eee")
 h1.pack(expand=TRUE, fill="x")
 
-buttonFrame = Frame(frame1)
-open_btn = Button(buttonFrame, text="Datendateien öffnen", command=openFileDialog)
-open_btn.pack(side=TOP, fill="x")
-deleteAll_btn = Button(buttonFrame, text="Alle entfernen", command=deleteSelectedFiles)
-deleteAll_btn.pack(side=BOTTOM, fill="x")
-buttonFrame.pack(side=LEFT)
+#Dialog Frame
+dialogFrame = Frame(root)
 
-dialogFrame = Frame(frame1)
-selectedFiles = Text(dialogFrame, height=4, borderwidth=2, relief=SUNKEN)
-selectedFiles.pack(fill="y")
-frame1.pack(pady=10, padx=5, fill="x")
-dialogFrame.pack(expand=True, fill="x")
+open_btn = Button(dialogFrame, text="Datendateien öffnen", command=openFileDialog, width=20, padx=0).grid(row=0, column=0)
+deleteAll_btn = Button(dialogFrame, text="Alle entfernen", command=deleteSelectedFiles, width=20, padx=0).grid(row=1, column=0)
+
+selectedFiles = Text(dialogFrame, height=4, borderwidth=2, relief=SUNKEN).grid(row=0, column=1, rowspan=2)
+
+dialogFrame.pack(fill="x", padx=5)
 
 #Detector Frame
 detectorFrame = Frame(root)
 
-encoding = Label(detectorFrame, text="CSV-Zeichenkodierung:", width=20, anchor="w", justify="left").grid(row=0, column=0)
+encoding = Label(detectorFrame, text="CSV-Zeichenkodierung:", width=20, anchor="w", justify="left", padx=0).grid(row=0, column=0)
 encodingText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN).grid(row=0, column=1)
 
-hasHeaderLabel = Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left").grid(row=1, column=0)
+hasHeaderLabel = Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left", padx=0).grid(row=1, column=0)
 hasHeaderText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN).grid(row=1, column=1)
 
 detectorFrame.pack(fill="x", padx=5)
