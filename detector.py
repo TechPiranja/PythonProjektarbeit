@@ -1,8 +1,6 @@
-import re
-
+import regex
 import chardet
 import csv
-
 import pandas
 
 
@@ -18,52 +16,22 @@ def hasHeader(filePath: str):
         return csv.Sniffer().has_header(result)
 
 
+# guesses Header Names based on Type which is checked with Regex Match
 def guessHeaderNames(dataFrame: pandas.DataFrame):
-    headerNames = {}
-    newHeaderColumn = {}
+    headerNameCount = {}
+    newHeaders = {}
 
     for column in dataFrame.columns:
-        sample = str(dataFrame[column][0])
-        headerName = getHeaderName(sample)
+        #get first data in column and detect its Type
+        sampleFromColumn = str(dataFrame[column][0])
+        headerName = regex.getHeaderName(sampleFromColumn)
 
-        if headerName not in headerNames:
-            headerNames[headerName] = 0
+        #add or increase count of Type
+        if headerName not in headerNameCount:
+            headerNameCount[headerName] = 0
+        else:
+            headerNameCount[headerName] += 1
 
-        count = headerNames[headerName]
-        headerName += "_" + str(count)
-
-        #increment count for next usage
-        headerNames[headerName] = count + 1
-        newHeaderColumn[column] = headerName
-
-    return newHeaderColumn
-
-
-reEmail = re.compile(r"^[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+.[a-z.]{2,6}$")
-reDate = re.compile(r"^[0-3]?[0-9][/.][0-3]?[0-9][/.](?:[0-9]{2})?[0-9]{2}$")
-reTime = re.compile(r"^[0-2]\d:[0-6]\d:[0-6]\d$")
-reNumber = re.compile(r"^[+-]?\d+([,.]\d+)?$")
-reCoordinate = re.compile(r"^(N|S)?0*\d{1,2}°0*\d{1,2}(′|')0*\d{1,2}\.\d*(″|\")(?(1)|(N|S)) (E|W)?0*\d{1,2}°0*\d{1,2}(′|')0*\d{1,2}\.\d*(″|\")(?(5)|(E|W))$")
-reUrl = re.compile(r"^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$")
-
-
-def getHeaderName(sample: str):
-    if reEmail.match(sample):
-        return "Email"
-
-    if reDate.match(sample):
-        return "Date"
-
-    if reTime.match(sample):
-        return "Time"
-
-    if reNumber.match(sample):
-        return "Number"
-
-    if reCoordinate.match(sample):
-        return "Coordinate"
-
-    if reUrl.match(sample):
-        return "Url"
-
-    return "Text"
+        #concat headerName with count as new ColumnHeader
+        newHeaders[column] = headerName + "_" + str(headerNameCount[headerName])
+    return newHeaders
