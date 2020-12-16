@@ -1,4 +1,3 @@
-# the importer shall import csv files
 import pandas as pd
 
 
@@ -9,14 +8,17 @@ class Importer:
         # TODO: this is just for testing, delete this!
         self.dataFrame = pd.read_csv(file)
 
-    # def convertToList(self):
-    #
+    def getList(self):
+        lists = self.dataFrame.values.tolist()
+        header = list(self.dataFrame.columns)
+        lists.insert(0, header)
+        return lists
 
     def getDict(self):
-        print(self.dataFrame.to_dict())
+        print(self.dataFrame.to_dict(orient="list"))
 
-    def getNumpyArr(self):
-        print(self.dataFrame.to_numpy())
+    def getNumpyArr(self):  # TODO: only accept number tables!
+        print(self.dataFrame.to_numpy(dtype="float32"))
 
     def getDataFrame(self):
         return self.dataFrame
