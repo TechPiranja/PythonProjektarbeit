@@ -15,6 +15,17 @@ def hasHeader(filePath: str):
         result = rawdata.read()
         return csv.Sniffer().has_header(result)
 
+def detectSepChar(filePath: str):
+    with open(filePath, 'r') as rawdata:
+        result = rawdata.read()
+        sniffer = csv.Sniffer().sniff(result)
+    return sniffer.delimiter
+
+def detectQuoteChar(filePath: str):
+    with open(filePath, 'r') as rawdata:
+        result = rawdata.read()
+        sniffer = csv.Sniffer().sniff(result)
+    return sniffer.quotechar
 
 # guesses Header Names based on Type which is checked with Regex Match
 def guessHeaderNames(dataFrame: pandas.DataFrame):

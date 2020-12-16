@@ -50,9 +50,13 @@ Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left", p
 hasHeaderText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
 hasHeaderText.grid(row=1, column=1)
 
-Label(detectorFrame, text="Seperator:", width=20, anchor="w", justify="left", padx=0).grid(row=1, column=0)
+Label(detectorFrame, text="Seperator:", width=20, anchor="w", justify="left", padx=0).grid(row=2, column=0)
 seperatorText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
-seperatorText.grid(row=1, column=1)
+seperatorText.grid(row=2, column=1)
+
+Label(detectorFrame, text="Quote Char:", width=20, anchor="w", justify="left", padx=0).grid(row=3, column=0)
+quoteCharText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
+quoteCharText.grid(row=3, column=1)
 
 detectorFrame.pack(fill="x", padx=5, pady=5)
 
@@ -64,10 +68,13 @@ frame2.pack(pady=10, padx=5, fill="both", side=TOP)
 
 def updateDf(files: list):
     # TODO use CSV Merge Method ( not implemented yet )
-    print(files)
+    print(str(detector.detectSepChar(files[0])))
+    print(str(detector.detectQuoteChar(files[0])))
     selectedFiles.insert(END, files)  # TODO: import without {} brackets
     encodingText.insert(1.0, detector.detectEncoding(files[0]))
     hasHeaderText.insert(1.0, str(detector.hasHeader(files[0])))
+    seperatorText.insert(1.0, str(detector.detectSepChar(files[0])))
+    quoteCharText.insert(1.0, str(detector.detectQuoteChar(files[0])))
     importer.importCSV(files[0])
     updatedDataframe = importer.getDataFrame()
     print("has Header: " + str(detector.hasHeader(files[0])))
