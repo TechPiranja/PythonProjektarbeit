@@ -67,10 +67,10 @@ def updateDf(files: list):
     print(files)
     selectedFiles.insert(END, files)  # TODO: import without {} brackets
     encodingText.insert(1.0, detector.detectEncoding(files[0]))
-    hasHeaderText.insert(1.0, str(detector.detectHeader(files[0])))
+    hasHeaderText.insert(1.0, str(detector.hasHeader(files[0])))
     importer.importCSV(files[0])
     updatedDataframe = importer.getDataFrame()
-    print("has Header: " + str(detector.detectHeader(files[0])))
+    print("has Header: " + str(detector.hasHeader(files[0])))
     pt.updateModel(TableModel(updatedDataframe))
     pt.redraw()
 

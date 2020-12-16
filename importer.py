@@ -1,5 +1,5 @@
 import pandas as pd
-
+import detector
 
 class Importer:
     dataFrame: pd.DataFrame
@@ -7,6 +7,10 @@ class Importer:
     def importCSV(self, file: str):
         # TODO: this is just for testing, delete this!
         self.dataFrame = pd.read_csv(file)
+
+        if detector.hasHeader(file) is False:
+            headers = detector.guessHeaderNames(self.dataFrame)
+            self.dataFrame.rename(columns=headers, inplace=True)
 
     def getList(self):
         lists = self.dataFrame.values.tolist()
