@@ -50,6 +50,10 @@ Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left", p
 hasHeaderText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
 hasHeaderText.grid(row=1, column=1)
 
+Label(detectorFrame, text="Seperator:", width=20, anchor="w", justify="left", padx=0).grid(row=1, column=0)
+seperatorText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
+seperatorText.grid(row=1, column=1)
+
 detectorFrame.pack(fill="x", padx=5, pady=5)
 
 #Vorschau und Pandastable
