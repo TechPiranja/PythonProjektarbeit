@@ -1,8 +1,16 @@
 import pandas as pd
 import detector
+from lxml import etree
 
 class Importer:
     dataFrame: pd.DataFrame
+
+    def importXML(self):
+        xmldoc = etree.parse("./testFiles/cdcatalog.xml")
+        transformer = etree.XSLT(etree.parse("./testFiles/cdcatalog2csv.xsl"))
+        # + Fehlerbehandlung: Datei-, Parsing-, Transformationsfehler
+        result = str(transformer(xmldoc, param1=u"'value'"))
+        print(result)
 
     def importCSV(self, file: str):
         # TODO: this is just for testing, delete this!
