@@ -19,7 +19,7 @@ class Dialect:
             self.quotechar = self.getSniffer(data).quotechar
             self.delimiter = self.getSniffer(data).delimiter
 
-    def guessDialectXML(self):
+    def guessDialectXML(self, xmlFile: str, xslFile: str):
         self.quotechar = self.getSniffer().quotechar
         self.delimiter = self.getSniffer().delimiter
         self.hasHeader = self.hasHeader()

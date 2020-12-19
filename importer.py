@@ -10,19 +10,23 @@ class Importer:
     def importXML(self):
         xmldoc = etree.parse("./testFiles/cdcatalog.xml")
         transformer = etree.XSLT(etree.parse("./testFiles/cdcatalog2csv.xsl"))
+
         # + Fehlerbehandlung: Datei-, Parsing-, Transformationsfehler
         result = str(transformer(xmldoc, param1=u"'value'"))
         data = StringIO(result)
-        self.importCSV(data)
 
-    def importCSV(self, file: str):
+        dialect = detector.Dialect()
+        dialect.guessDialectXML(result)
+        self.importCSV(data, dialect)
+
+    def importCSV(self, file: str, dialect: detector.Dialect):
         # TODO: this is just for testing, delete this!
         self.dataFrame = pd.read_csv(file)
 
         #TODO: hasHeader has do be checked another way!
-        #if detector.hasHeader(file) is False:
-        #    headers = detector.guessHeaderNames(self.dataFrame)
-        #    self.dataFrame.rename(columns=headers, inplace=True)
+        if dialect.hasHeader is False:
+           headers = detector.guessHeaderNames(self.dataFrame)
+           self.dataFrame.rename(columns=headers, inplace=True)
 
     def getList(self):
         lists = self.dataFrame.values.tolist()

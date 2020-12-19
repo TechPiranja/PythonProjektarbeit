@@ -79,7 +79,7 @@ def updateDf(files: list):
         seperatorText.insert(1.0, dialect.delimiter)
         quoteCharText.insert(1.0, dialect.quotechar)
 
-        importer.importCSV(files[0])
+        importer.importCSV(files[0], dialect)
         updatedDataframe = importer.getDataFrame()
         pt.updateModel(TableModel(updatedDataframe))
         pt.redraw()
