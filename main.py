@@ -72,19 +72,21 @@ def updateDf(files: list):
         dialect = detector.Dialect()
         dialect.guessDialectCSV(files[0])
 
+        importer.importCSV(files[0], dialect)
+        updatedDataframe = importer.getDataFrame()
+        pt.updateModel(TableModel(updatedDataframe))
+        pt.redraw()
+
         # TODO use CSV Merge Method ( not implemented yet )
         selectedFiles.insert(END, files)  # TODO: import without {} brackets
         encodingText.insert(1.0, dialect.encoding)
         hasHeaderText.insert(1.0, dialect.hasHeader)
         seperatorText.insert(1.0, dialect.delimiter)
         quoteCharText.insert(1.0, dialect.quotechar)
-
-        importer.importCSV(files[0], dialect)
-        updatedDataframe = importer.getDataFrame()
-        pt.updateModel(TableModel(updatedDataframe))
-        pt.redraw()
-    elif files[0].endswith(".xml"):
-        importer.importXML()
+    elif files[0].endswith(".xml") or files[0].endswith(".xsl"):
+        xmlFile = files[0]
+        xslFile = files[1]
+        importer.importXML(xmlFile, xslFile)
         updatedDataframe = importer.getDataFrame()
         pt.updateModel(TableModel(updatedDataframe))
         pt.redraw()

@@ -7,16 +7,16 @@ from lxml import etree
 class Importer:
     dataFrame: pd.DataFrame
 
-    def importXML(self):
-        xmldoc = etree.parse("./testFiles/cdcatalog.xml")
-        transformer = etree.XSLT(etree.parse("./testFiles/cdcatalog2csv.xsl"))
+    def importXML(self, xmlFile: str, xslFile: str):
+        xmldoc = etree.parse(xmlFile)
+        transformer = etree.XSLT(etree.parse(xslFile))
 
         # + Fehlerbehandlung: Datei-, Parsing-, Transformationsfehler
         result = str(transformer(xmldoc, param1=u"'value'"))
         data = StringIO(result)
 
         dialect = detector.Dialect()
-        dialect.guessDialectXML(result)
+        dialect.guessDialectFromData(result)
         self.importCSV(data, dialect)
 
     def importCSV(self, file: str, dialect: detector.Dialect):
