@@ -69,18 +69,18 @@ frame2.pack(pady=10, padx=5, fill="both", side=TOP)
 def updateDf(files: list):
     #TODO: Sniffer can only be used on csv?!
     if files[0].endswith(".csv"):
+        dialect = detector.Dialect()
+        dialect.guessDialectCSV(files[0])
+
         # TODO use CSV Merge Method ( not implemented yet )
-        print(str(detector.detectSepChar(files[0])))
-        print(str(detector.detectQuoteChar(files[0])))
         selectedFiles.insert(END, files)  # TODO: import without {} brackets
-        encodingText.insert(1.0, detector.detectEncoding(files[0]))
-        hasHeaderText.insert(1.0, str(detector.hasHeader(files[0])))
-        seperatorText.insert(1.0, str(detector.detectSepChar(files[0])))
-        quoteCharText.insert(1.0, str(detector.detectQuoteChar(files[0])))
+        encodingText.insert(1.0, dialect.encoding)
+        hasHeaderText.insert(1.0, dialect.hasHeader)
+        seperatorText.insert(1.0, dialect.delimiter)
+        quoteCharText.insert(1.0, dialect.quotechar)
 
         importer.importCSV(files[0])
         updatedDataframe = importer.getDataFrame()
-        print("has Header: " + str(detector.hasHeader(files[0])))
         pt.updateModel(TableModel(updatedDataframe))
         pt.redraw()
     elif files[0].endswith(".xml"):

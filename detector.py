@@ -4,28 +4,41 @@ import csv
 import pandas
 
 
-def detectEncoding(filePath: str):
-    with open(filePath, 'rb') as rawdata:
-        result = chardet.detect(rawdata.read())
+class Dialect:
+    encoding: str = "utf-8"
+    hasHeader: bool = False
+    delimiter: str = ","
+    quoteChar: str = "\""
+
+    def guessDialectCSV(self, filePath: str):
+        self.hasHeader = self.hasHeader(filePath)
+        self.encoding = self.detectEncoding(filePath)
+
+        with open(filePath, 'r') as rawdata:
+            data = rawdata.read()
+            self.quotechar = self.getSniffer(data).quotechar
+            self.delimiter = self.getSniffer(data).delimiter
+
+    def guessDialectXML(self):
+        self.quotechar = self.getSniffer().quotechar
+        self.delimiter = self.getSniffer().delimiter
+        self.hasHeader = self.hasHeader()
+        self.encoding = self.detectEncoding()
+
+    def detectEncoding(self, filePath: str):
+        with open(filePath, 'rb') as rawdata:
+            data = rawdata.read()
+        result = chardet.detect(data)
         return result["encoding"]
 
+    def hasHeader(self, filePath: str):
+        with open(filePath, 'r') as rawdata:
+            data = rawdata.read()
+        return csv.Sniffer().has_header(data)
 
-def hasHeader(filePath: str):
-    with open(filePath, 'r') as rawdata:
-        result = rawdata.read()
-        return csv.Sniffer().has_header(result)
+    def getSniffer(self, data: str):
+        return csv.Sniffer().sniff(data)
 
-def detectSepChar(filePath: str):
-    with open(filePath, 'r') as rawdata:
-        result = rawdata.read()
-        sniffer = csv.Sniffer().sniff(result)
-    return sniffer.delimiter
-
-def detectQuoteChar(filePath: str):
-    with open(filePath, 'r') as rawdata:
-        result = rawdata.read()
-        sniffer = csv.Sniffer().sniff(result)
-    return sniffer.quotechar
 
 # guesses Header Names based on Type which is checked with Regex Match
 def guessHeaderNames(dataFrame: pandas.DataFrame):
@@ -33,16 +46,16 @@ def guessHeaderNames(dataFrame: pandas.DataFrame):
     newHeaders = {}
 
     for column in dataFrame.columns:
-        #get first data in column and detect its Type
+        # get first data in column and detect its Type
         sampleFromColumn = str(dataFrame[column][0])
         headerName = regex.getHeaderName(sampleFromColumn)
 
-        #add or increase count of Type
+        # add or increase count of Type
         if headerName not in headerNameCount:
             headerNameCount[headerName] = 0
         else:
             headerNameCount[headerName] += 1
 
-        #concat headerName with count as new ColumnHeader
+        # concat headerName with count as new ColumnHeader
         newHeaders[column] = headerName + "_" + str(headerNameCount[headerName])
     return newHeaders
