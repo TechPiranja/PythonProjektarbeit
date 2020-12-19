@@ -84,9 +84,14 @@ def updateDf(files: list):
         seperatorText.insert(1.0, dialect.delimiter)
         quoteCharText.insert(1.0, dialect.quotechar)
     elif files[0].endswith(".xml") or files[0].endswith(".xsl"):
+        selectedFiles.insert(END, files)
         xmlFile = files[0]
         xslFile = files[1]
-        importer.importXML(xmlFile, xslFile)
+        dialect = importer.importXML(xmlFile, xslFile)
+        hasHeaderText.insert(1.0, dialect.hasHeader)
+        seperatorText.insert(1.0, dialect.delimiter)
+        quoteCharText.insert(1.0, dialect.quotechar)
+        encodingText.insert(1.0, "XSLT")
         updatedDataframe = importer.getDataFrame()
         pt.updateModel(TableModel(updatedDataframe))
         pt.redraw()

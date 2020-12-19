@@ -16,8 +16,9 @@ class Importer:
         data = StringIO(result)
 
         dialect = detector.Dialect()
-        dialect.guessDialectFromData(result)
+        dialect.guessDialectXML(result)
         self.importCSV(data, dialect)
+        return dialect
 
     def importCSV(self, file: str, dialect: detector.Dialect):
         # TODO: this is just for testing, delete this!
