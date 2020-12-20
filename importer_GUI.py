@@ -74,7 +74,7 @@ class ImporterGUI:
         return self.selectedFiles.get(1.0, END)
 
     def export(self):
-        exporter_GUI.initExporterDialog(self.root, self.pt)
+        exporter_GUI.initExportDialog(self.root, self.pt)
 
     def updateDf(self, files: list):
         # TODO: Sniffer can only be used on csv?!

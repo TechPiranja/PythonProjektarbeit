@@ -5,7 +5,6 @@ class Main:
     def __init__(self):
         self.root = Tk()
         self.root.title("Tabelle importieren")
-        print("test")
         ImporterGUI(self.root)
         self.root.mainloop()
 
