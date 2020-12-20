@@ -3,6 +3,7 @@ from importer import Importer
 from tkinter.filedialog import askopenfilenames
 from pandastable import Table, TableModel
 import detector
+import exporter_GUI
 
 importer = Importer()
 
@@ -25,17 +26,8 @@ def deleteSelectedFiles():
 def getSelectedFiles():
     return selectedFiles.get(1.0, END)
 
-def exportToCSV():
-    pt.doExport("./testFiles/testfile.csv")
-    print("Test")
-
 def export():
-    window = Toplevel(root)
-    h1 = Label(window, text="Tabelle exportieren", bg="#eee")
-    h1.pack(padx=5, pady=5, fill="x")
-
-    exportBtn = Button(window, text="Exportieren", command=exportToCSV, width=20, padx=0)
-    exportBtn.pack(fill="x", padx=10, pady=10)
+    exporter_GUI.initExporterDialog(root, pt)
 
 #Dialog Frame
 dialogFrame = Frame(root)
