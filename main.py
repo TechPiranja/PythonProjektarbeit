@@ -25,6 +25,18 @@ def deleteSelectedFiles():
 def getSelectedFiles():
     return selectedFiles.get(1.0, END)
 
+def exportToCSV():
+    pt.doExport("./testFiles/testfile.csv")
+    print("Test")
+
+def export():
+    window = Toplevel(root)
+    h1 = Label(window, text="Tabelle exportieren", bg="#eee")
+    h1.pack(padx=5, pady=5, fill="x")
+
+    exportBtn = Button(window, text="Exportieren", command=exportToCSV, width=20, padx=0)
+    exportBtn.pack(fill="x", padx=10, pady=10)
+
 #Dialog Frame
 dialogFrame = Frame(root)
 
@@ -66,6 +78,8 @@ vorschau.pack(expand=TRUE, fill="x", padx=5, side=TOP)
 pt.show()
 frame2.pack(pady=10, padx=5, fill="both", side=TOP)
 
+exportBtn = Button(root, text="Exportieren", command=export, width=20, padx=0)
+exportBtn.pack(fill="x", padx=10, pady=10)
 def updateDf(files: list):
     #TODO: Sniffer can only be used on csv?!
     if files[0].endswith(".csv"):
