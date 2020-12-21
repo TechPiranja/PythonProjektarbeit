@@ -1,4 +1,4 @@
 from pandastable import Table
 
-def exportToCSV(pt: Table):
-    pt.doExport("./testFiles/testfile1.csv")
+def exportToCSV(filePath: str, pt: Table):
+    pt.doExport(filePath)
