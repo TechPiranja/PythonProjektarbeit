@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk
 from importer_GUI import ImporterGUI
 
 class Main:

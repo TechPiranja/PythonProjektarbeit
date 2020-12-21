@@ -1,5 +1,5 @@
 from functools import partial
-from tkinter import *
+from tkinter import END, Tk, Toplevel, Label, Frame, Text, SUNKEN, Button
 from tkinter.filedialog import askdirectory
 from pandastable import Table
 import exporter

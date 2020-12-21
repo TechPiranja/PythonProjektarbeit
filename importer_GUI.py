@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP
 from tkinter.filedialog import askopenfilenames
 from pandastable import Table, TableModel
 import detector
