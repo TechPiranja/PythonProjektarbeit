@@ -38,8 +38,8 @@ class Importer:
     def getDict(self):
         print(self.dataFrame.to_dict(orient="list"))
 
-    def getNumpyArr(self):  # TODO: only accept number tables!
-        print(self.dataFrame.to_numpy(dtype="float32"))
+    def getNumpyArr(self):
+        print(self.dataFrame.to_numpy())
 
     def getDataFrame(self):
         return self.dataFrame
