@@ -7,13 +7,13 @@ from importer import Importer
 
 importer = Importer()
 
-
 class ImporterGUI:
     def __init__(self, root: Tk):
         self.root = root
         self.frame1 = Frame(root)
         self.frame2 = Frame(root)
         self.pt = Table(self.frame2)
+        self.dialect = detector.Dialect()
 
         h1 = Label(self.root, text="Datendateien", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
@@ -74,33 +74,32 @@ class ImporterGUI:
         return self.selectedFiles.get(1.0, END)
 
     def export(self):
-        exporter_GUI.initExportDialog(self.root, self.pt)
+        exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
     def updateDf(self, files: list):
         # TODO: Sniffer can only be used on csv?!
         if files[0].endswith(".csv"):
-            dialect = detector.Dialect()
-            dialect.guessDialectCSV(files[0])
+            self.dialect.guessDialectCSV(files[0])
 
-            importer.importCSV(files[0], dialect)
+            importer.importCSV(files[0], self.dialect)
             updatedDataframe = importer.getDataFrame()
             self.pt.updateModel(TableModel(updatedDataframe))
             self.pt.redraw()
 
             # TODO use CSV Merge Method ( not implemented yet )
             self.selectedFiles.insert(END, files)  # TODO: import without {} brackets
-            self.encodingText.insert(1.0, dialect.encoding)
-            self.hasHeaderText.insert(1.0, dialect.hasHeader)
-            self.seperatorText.insert(1.0, dialect.delimiter)
-            self.quoteCharText.insert(1.0, dialect.quotechar)
+            self.encodingText.insert(1.0, self.dialect.encoding)
+            self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+            self.seperatorText.insert(1.0, self.dialect.delimiter)
+            self.quoteCharText.insert(1.0, self.dialect.quotechar)
         elif files[0].endswith(".xml") or files[0].endswith(".xsl"):
             self.selectedFiles.insert(END, files)
             xmlFile = files[0]
             xslFile = files[1]
-            dialect = importer.importXML(xmlFile, xslFile)
-            self.hasHeaderText.insert(1.0, dialect.hasHeader)
-            self.seperatorText.insert(1.0, dialect.delimiter)
-            self.quoteCharText.insert(1.0, dialect.quotechar)
+            self.dialect = importer.importXML(xmlFile, xslFile)
+            self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+            self.seperatorText.insert(1.0, self.dialect.delimiter)
+            self.quoteCharText.insert(1.0, self.dialect.quotechar)
             self.encodingText.insert(1.0, "XSLT")
             updatedDataframe = importer.getDataFrame()
             self.pt.updateModel(TableModel(updatedDataframe))
