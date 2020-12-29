@@ -2,6 +2,7 @@ from io import StringIO
 import pandas as pd
 import detector
 from lxml import etree
+import csv
 
 
 class Importer:
@@ -20,14 +21,31 @@ class Importer:
         self.importCSV(data, dialect)
         return dialect
 
+    def checkMatchingHeaderCSV(self, files: list):
+        checkHeader = []
+        for file in files:
+            with open(file, "r") as f:
+                reader = csv.reader(f)
+                header = next(reader)
+
+                if not checkHeader:
+                    checkHeader = header
+                    continue
+
+                #if the Header is not matching return False
+                if set(header) != set(checkHeader):
+                    return False
+
+        return True
+
     def importCSV(self, file: str, dialect: detector.Dialect):
         # TODO: this is just for testing, delete this!
         self.dataFrame = pd.read_csv(file)
 
-        #TODO: hasHeader has do be checked another way!
+        # TODO: hasHeader has do be checked another way!
         if dialect.hasHeader is False:
-           headers = detector.guessHeaderNames(self.dataFrame)
-           self.dataFrame.rename(columns=headers, inplace=True)
+            headers = detector.guessHeaderNames(self.dataFrame)
+            self.dataFrame.rename(columns=headers, inplace=True)
 
     def getList(self):
         lists = self.dataFrame.values.tolist()
