@@ -76,9 +76,28 @@ class ImporterGUI:
     def export(self):
         exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
+    def mergeFiles(self, files: list):
+        csvFiles = []
+        xmlXslFiles = []
+
+        #sort files
+        for file in files:
+            if file.endswith(".csv"):
+                csvFiles.append(file)
+            if file.endswith(".xml") or file.endswith(".xsl"):
+                xmlXslFiles.append(file)
+
+        isMatching = importer.checkMatchingHeaderCSV(csvFiles)
+        if (isMatching is False): print("cant merge without matching header columns!")
+
+
     def updateDf(self, files: list):
-        # TODO: Sniffer can only be used on csv?!
-        if files[0].endswith(".csv"):
+        if len(files) > 1:
+            #MERGE FILES
+            self.mergeFiles(files)
+        
+        #TODO: merge xml mit csv?
+        elif files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])
 
             importer.importCSV(files[0], self.dialect)
@@ -92,7 +111,7 @@ class ImporterGUI:
             self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
             self.seperatorText.insert(1.0, self.dialect.delimiter)
             self.quoteCharText.insert(1.0, self.dialect.quotechar)
-        elif files[0].endswith(".xml") or files[0].endswith(".xsl"):
+        elif files[0].endswith(".xml") and files[1].endswith(".xsl"):
             self.selectedFiles.insert(END, files)
             xmlFile = files[0]
             xslFile = files[1]
