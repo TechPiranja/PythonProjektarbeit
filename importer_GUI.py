@@ -4,8 +4,10 @@ from pandastable import Table, TableModel
 import detector
 import exporter_GUI
 from importer import Importer
+from merger import Merger
 
 importer = Importer()
+merger = Merger()
 
 class ImporterGUI:
     def __init__(self, root: Tk):
@@ -74,29 +76,21 @@ class ImporterGUI:
         return self.selectedFiles.get(1.0, END)
 
     def export(self):
+        #get updated df if changes where made in the pandastable
+        importer.setDataFrame(self.pt.model.df)
         exporter_GUI.initExportDialog(self.root, importer, self.dialect)
-
-    def mergeFiles(self, files: list):
-        csvFiles = []
-        xmlXslFiles = []
-
-        #sort files
-        for file in files:
-            if file.endswith(".csv"):
-                csvFiles.append(file)
-            if file.endswith(".xml") or file.endswith(".xsl"):
-                xmlXslFiles.append(file)
-
-        isMatching = importer.checkMatchingHeaderCSV(csvFiles)
-        if (isMatching is False): print("cant merge without matching header columns!")
-
 
     def updateDf(self, files: list):
         if len(files) > 1:
             #MERGE FILES
-            self.mergeFiles(files)
-        
-        #TODO: merge xml mit csv?
+            canMerge = merger.isMergePossible(files)
+            if canMerge:
+                newDataFrame = merger.mergeCSVFiles(files)
+                importer.setDataFrame(newDataFrame)
+                self.pt.updateModel(TableModel(newDataFrame))
+                self.pt.redraw()
+
+        #TODO: merge xml mit csv
         elif files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])
 
@@ -106,18 +100,33 @@ class ImporterGUI:
             self.pt.redraw()
 
             # TODO use CSV Merge Method ( not implemented yet )
-            self.selectedFiles.insert(END, files)  # TODO: import without {} brackets
+            self.deleteSelectedFiles()
+            self.selectedFiles.insert(END, files)
+
+            self.encodingText.delete(1.0, END)
             self.encodingText.insert(1.0, self.dialect.encoding)
+
+            self.hasHeaderText.delete(1.0, END)
             self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+
+            self.seperatorText.delete(1.0, END)
             self.seperatorText.insert(1.0, self.dialect.delimiter)
+
+            self.quoteCharText.delete(1.0, END)
             self.quoteCharText.insert(1.0, self.dialect.quotechar)
         elif files[0].endswith(".xml") and files[1].endswith(".xsl"):
             self.selectedFiles.insert(END, files)
             xmlFile = files[0]
             xslFile = files[1]
             self.dialect = importer.importXML(xmlFile, xslFile)
+
+            self.hasHeaderText.delete(1.0, END)
             self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+
+            self.seperatorText.delete(1.0, END)
             self.seperatorText.insert(1.0, self.dialect.delimiter)
+
+            self.quoteCharText.delete(1.0, END)
             self.quoteCharText.insert(1.0, self.dialect.quotechar)
             self.encodingText.insert(1.0, "XSLT")
             updatedDataframe = importer.getDataFrame()
