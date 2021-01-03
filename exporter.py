@@ -2,7 +2,7 @@ from lxml import etree
 
 
 def exportToCSV(filePath: str, dataframe, dialect):
-    dataframe.to_csv(filePath + ".csv", encoding=dialect.encoding, sep=dialect.delimiter, quotechar=dialect.quotechar)
+    dataframe.to_csv(filePath + ".csv", encoding=dialect.encoding, sep=dialect.delimiter, quotechar=dialect.quotechar, index=False)
     #TODO: Message that the File was exported successfully!
 
 def exportToXML(filePath: str, dataframe, dialect):
