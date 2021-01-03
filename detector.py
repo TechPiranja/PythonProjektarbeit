@@ -15,14 +15,14 @@ class Dialect:
 
         with open(filePath, 'r') as rawdata:
             data = rawdata.read()
-            self.hasHeader = self.hasHeader(data)
+            self.hasHeader = self.checkHasHeader(data)
             self.quotechar = self.getSniffer(data).quotechar
             self.delimiter = self.getSniffer(data).delimiter
 
     def guessDialectXML(self, data: str):
         self.quotechar = self.getSniffer(data).quotechar
         self.delimiter = self.getSniffer(data).delimiter
-        self.hasHeader = self.hasHeader(data)
+        self.hasHeader = self.checkHasHeader(data)
 
     def detectEncoding(self, filePath: str):
         with open(filePath, 'rb') as rawdata:
@@ -30,7 +30,7 @@ class Dialect:
         result = chardet.detect(data)
         return result["encoding"]
 
-    def hasHeader(self, data: str):
+    def checkHasHeader(self, data: str):
         return csv.Sniffer().has_header(data)
 
     def getSniffer(self, data: str):
