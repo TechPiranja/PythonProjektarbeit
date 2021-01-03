@@ -18,6 +18,8 @@ class Merger:
             if file.endswith(".xml") or file.endswith(".xsl"):
                 xmlXslFiles.append(file)
 
+        #TODO: check if xml and csv can be merged
+
         isMatching = self.checkMatchingHeaderCSV(csvFiles)
         if isMatching is False:
             # TODO show error in gui

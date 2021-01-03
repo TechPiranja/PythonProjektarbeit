@@ -1,4 +1,4 @@
-from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP
+from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP, Listbox, SINGLE, Scrollbar, Entry
 from tkinter.filedialog import askopenfilenames
 from pandastable import Table, TableModel
 import detector
@@ -22,13 +22,22 @@ class ImporterGUI:
 
         # Dialog Frame
         dialogFrame = Frame(self.root)
-
-        open_btn = Button(dialogFrame, text="Datendateien öffnen", command=self.openFileDialog, width=20, padx=0)
+        dialogFrame.grid_columnconfigure(1, weight=1)
+        open_btn = Button(dialogFrame, text="Datendateien öffnen", command=self.openFileDialog, width=20)
         open_btn.grid(row=0, column=0)
-        deleteAll_btn = Button(dialogFrame, text="Alle entfernen", command=self.deleteSelectedFiles, width=20, padx=0)
+        deleteAll_btn = Button(dialogFrame, text="Alle entfernen", command=self.deleteSelectedFiles, width=20)
         deleteAll_btn.grid(row=1, column=0)
-        self.selectedFiles = Text(dialogFrame, height=4, borderwidth=2, relief=SUNKEN)
-        self.selectedFiles.grid(row=0, column=1, rowspan=2)
+
+        listbox_border = Frame(dialogFrame, bd=2, relief="sunken", background="white")
+        listbox_border.grid(row=0, column=1, rowspan=2, padx=3, sticky="nsew")
+
+        self.selectedFiles = Listbox(listbox_border, selectmode=SINGLE, height=4, borderwidth=0, highlightthickness=0, relief=SUNKEN, background="white")
+
+        vsb = Scrollbar(listbox_border, orient="vertical", command=self.selectedFiles.yview)
+        self.selectedFiles.configure(yscrollcommand=vsb)
+        vsb.pack(side="right", fill="y")
+        self.selectedFiles.pack(padx=2, pady=2, fill="both", expand=True)
+
         dialogFrame.pack(fill="x", padx=5)
 
         # Detector Frame
@@ -70,10 +79,15 @@ class ImporterGUI:
         self.updateDf(files)
 
     def deleteSelectedFiles(self):
-        self.selectedFiles.delete(1.0, END)
+        self.selectedFiles.delete(0, END)
 
     def getSelectedFiles(self):
-        return self.selectedFiles.get(1.0, END)
+        return self.selectedFiles.get(0, END)
+
+    def updateSelectedFiles(self, files):
+        self.deleteSelectedFiles()
+        for index, file in enumerate(files):
+            self.selectedFiles.insert(index, file)
 
     def export(self):
         #get updated df if changes where made in the pandastable
@@ -86,8 +100,7 @@ class ImporterGUI:
             #TODO: merge xml mit csv
             canMerge = merger.isMergePossible(files)
             if canMerge:
-                self.deleteSelectedFiles()
-                self.selectedFiles.insert(END, files)
+                self.updateSelectedFiles(files)
                 newDataFrame = merger.mergeCSVFiles(files)
                 importer.setDataFrame(newDataFrame)
                 self.pt.updateModel(TableModel(newDataFrame))
@@ -103,8 +116,7 @@ class ImporterGUI:
             self.pt.redraw()
 
             # TODO use CSV Merge Method ( not implemented yet )
-            self.deleteSelectedFiles()
-            self.selectedFiles.insert(END, files)
+            self.updateSelectedFiles(files)
 
             self.encodingText.delete(1.0, END)
             self.encodingText.insert(1.0, self.dialect.encoding)
@@ -118,7 +130,7 @@ class ImporterGUI:
             self.quoteCharText.delete(1.0, END)
             self.quoteCharText.insert(1.0, self.dialect.quotechar)
         elif files[0].endswith(".xml") and files[1].endswith(".xsl"):
-            self.selectedFiles.insert(END, files)
+            self.updateSelectedFiles(files)
             xmlFile = files[0]
             xslFile = files[1]
             importer.importXML(xmlFile, xslFile)
