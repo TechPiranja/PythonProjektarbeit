@@ -83,6 +83,7 @@ class ImporterGUI:
     def updateDf(self, files: list):
         if len(files) > 1:
             #MERGE FILES
+            #TODO: merge xml mit csv
             canMerge = merger.isMergePossible(files)
             if canMerge:
                 self.deleteSelectedFiles()
@@ -92,7 +93,7 @@ class ImporterGUI:
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
 
-        #TODO: merge xml mit csv
+
         elif files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])
 
@@ -120,7 +121,8 @@ class ImporterGUI:
             self.selectedFiles.insert(END, files)
             xmlFile = files[0]
             xslFile = files[1]
-            self.dialect = importer.importXML(xmlFile, xslFile)
+            importer.importXML(xmlFile, xslFile)
+            self.dialect = importer.dialect
 
             self.hasHeaderText.delete(1.0, END)
             self.hasHeaderText.insert(1.0, self.dialect.hasHeader)

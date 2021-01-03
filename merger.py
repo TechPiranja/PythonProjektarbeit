@@ -2,11 +2,12 @@ import csv
 
 import pandas as pd
 
+
 class Merger:
     dataframe = pd.DataFrame
 
     def isMergePossible(self, files: list):
-        #TODO: also get header if there is none! and merge them if possible
+        # TODO: also get header if there is none! and merge them if possible
         csvFiles = []
         xmlXslFiles = []
 
