@@ -46,7 +46,7 @@ class ImporterGUI:
 
         detectorFrame = Frame(root)
 
-        Label(detectorFrame, text="CSV-Zeichenkodierung:", width=20, anchor="w", justify="left", padx=0).grid(row=0,
+        Label(detectorFrame, text="Zeichenkodierung:", width=20, anchor="w", justify="left", padx=0).grid(row=0,
                                                                                                               column=0)
         self.encodingText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
         self.encodingText.grid(row=0, column=1)
@@ -95,7 +95,27 @@ class ImporterGUI:
         exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
     def updateDf(self, files: list):
-        if len(files) > 1:
+        if files[0].endswith(".xml") and files[1].endswith(".xsl"):
+            self.updateSelectedFiles(files)
+            xmlFile = files[0]
+            xslFile = files[1]
+            importer.importXML(xmlFile, xslFile)
+            self.dialect = importer.dialect
+
+            self.hasHeaderText.delete(1.0, END)
+            self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+
+            self.seperatorText.delete(1.0, END)
+            self.seperatorText.insert(1.0, self.dialect.delimiter)
+
+            self.quoteCharText.delete(1.0, END)
+            self.quoteCharText.insert(1.0, self.dialect.quotechar)
+            self.encodingText.insert(1.0, "XSLT")
+            updatedDataframe = importer.getDataFrame()
+            self.pt.updateModel(TableModel(updatedDataframe))
+            self.pt.redraw()
+
+        elif len(files) > 1:
             #MERGE FILES
             #TODO: merge xml mit csv
             canMerge = merger.isMergePossible(files)
@@ -105,7 +125,6 @@ class ImporterGUI:
                 importer.setDataFrame(newDataFrame)
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
-
 
         elif files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])
@@ -129,22 +148,4 @@ class ImporterGUI:
 
             self.quoteCharText.delete(1.0, END)
             self.quoteCharText.insert(1.0, self.dialect.quotechar)
-        elif files[0].endswith(".xml") and files[1].endswith(".xsl"):
-            self.updateSelectedFiles(files)
-            xmlFile = files[0]
-            xslFile = files[1]
-            importer.importXML(xmlFile, xslFile)
-            self.dialect = importer.dialect
 
-            self.hasHeaderText.delete(1.0, END)
-            self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
-
-            self.seperatorText.delete(1.0, END)
-            self.seperatorText.insert(1.0, self.dialect.delimiter)
-
-            self.quoteCharText.delete(1.0, END)
-            self.quoteCharText.insert(1.0, self.dialect.quotechar)
-            self.encodingText.insert(1.0, "XSLT")
-            updatedDataframe = importer.getDataFrame()
-            self.pt.updateModel(TableModel(updatedDataframe))
-            self.pt.redraw()
