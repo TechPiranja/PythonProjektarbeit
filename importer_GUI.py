@@ -85,6 +85,8 @@ class ImporterGUI:
             #MERGE FILES
             canMerge = merger.isMergePossible(files)
             if canMerge:
+                self.deleteSelectedFiles()
+                self.selectedFiles.insert(END, files)
                 newDataFrame = merger.mergeCSVFiles(files)
                 importer.setDataFrame(newDataFrame)
                 self.pt.updateModel(TableModel(newDataFrame))
