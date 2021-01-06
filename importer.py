@@ -36,10 +36,7 @@ class Importer:
             self.dataFrame.rename(columns=headers, inplace=True)
 
     def getList(self):
-        lists = self.dataFrame.values.tolist()
-        header = list(self.dataFrame.columns)
-        lists.insert(0, header)
-        return lists
+        return [list(self.dataFrame.columns), self.dataFrame.values.tolist()]
 
     def getDict(self):
         print(self.dataFrame.to_dict(orient="list"))

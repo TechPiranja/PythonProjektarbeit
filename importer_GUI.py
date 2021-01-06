@@ -23,13 +23,15 @@ class ImporterGUI:
         # Dialog Frame
         dialogFrame = Frame(self.root)
         dialogFrame.grid_columnconfigure(1, weight=1)
-        open_btn = Button(dialogFrame, text="Datendateien öffnen", command=self.openFileDialog, width=20)
+        open_btn = Button(dialogFrame, text="Import Files", command=self.openFileDialog, width=20)
         open_btn.grid(row=0, column=0)
-        deleteAll_btn = Button(dialogFrame, text="Alle entfernen", command=self.deleteSelectedFiles, width=20)
-        deleteAll_btn.grid(row=1, column=0)
+        open_btn = Button(dialogFrame, text="Delete selected File", command=self.deleteSelectedFile(), width=20)
+        open_btn.grid(row=1, column=0)
+        deleteAll_btn = Button(dialogFrame, text="Delete all", command=self.deleteAllFiles, width=20)
+        deleteAll_btn.grid(row=2, column=0)
 
         listbox_border = Frame(dialogFrame, bd=2, relief="sunken", background="white")
-        listbox_border.grid(row=0, column=1, rowspan=2, padx=3, sticky="nsew")
+        listbox_border.grid(row=0, column=1, rowspan=3, padx=3, sticky="nsew")
 
         self.selectedFiles = Listbox(listbox_border, selectmode=SINGLE, height=4, borderwidth=0, highlightthickness=0, relief=SUNKEN, background="white")
 
@@ -46,8 +48,7 @@ class ImporterGUI:
 
         detectorFrame = Frame(root)
 
-        Label(detectorFrame, text="Zeichenkodierung:", width=20, anchor="w", justify="left", padx=0).grid(row=0,
-                                                                                                              column=0)
+        Label(detectorFrame, text="Encoding:", width=20, anchor="w", justify="left", padx=0).grid(row=0, column=0)
         self.encodingText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
         self.encodingText.grid(row=0, column=1)
 
@@ -71,21 +72,25 @@ class ImporterGUI:
         self.pt.show()
         self.frame2.pack(pady=10, padx=5, fill="both", side=TOP)
 
-        exportBtn = Button(root, text="Exportieren", command=self.export, width=20, padx=0)
+        exportBtn = Button(root, text="Export", command=self.export, width=20, padx=0)
         exportBtn.pack(fill="x", padx=10, pady=10)
 
     def openFileDialog(self):
         files = list(askopenfilenames(parent=self.root, title='Choose a file'))
         self.updateDf(files)
 
-    def deleteSelectedFiles(self):
+    #TODO: finish this
+    def deleteSelectedFile(self):
+        self.selectedFiles.delete(0, END)
+
+    def deleteAllFiles(self):
         self.selectedFiles.delete(0, END)
 
     def getSelectedFiles(self):
         return self.selectedFiles.get(0, END)
 
     def updateSelectedFiles(self, files):
-        self.deleteSelectedFiles()
+        self.deleteAllFiles()
         for index, file in enumerate(files):
             self.selectedFiles.insert(index, file)
 
