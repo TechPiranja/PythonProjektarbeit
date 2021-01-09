@@ -1,6 +1,6 @@
 import csv
-
 import pandas as pd
+from tkinter import messagebox
 
 
 class Merger:
@@ -22,8 +22,7 @@ class Merger:
 
         isMatching = self.checkMatchingHeaderCSV(csvFiles)
         if isMatching is False:
-            # TODO show error in gui
-            print("cant merge without matching header columns!")
+            messagebox.showerror("Merge Error", "Cant merge tables without matching header columns!")
 
         return isMatching
 
@@ -34,7 +33,6 @@ class Merger:
             df = pd.read_csv(file)
             print(df)
             mergedDf = pd.concat([mergedDf, df])
-            print("merged")
         return mergedDf
 
     def checkMatchingHeaderCSV(self, files: list):
