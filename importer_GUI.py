@@ -17,7 +17,7 @@ class ImporterGUI:
         self.pt = Table(self.frame2)
         self.dialect = detector.Dialect()
 
-        h1 = Label(self.root, text="Datendateien", bg="#eee")
+        h1 = Label(self.root, text="Imported Files", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
 
         # Dialog Frame
@@ -67,7 +67,7 @@ class ImporterGUI:
         detectorFrame.pack(fill="x", padx=5, pady=5)
 
         # Vorschau und Pandastable
-        vorschau = Label(root, text="Vorschau", bg="#eee")
+        vorschau = Label(root, text="Preview", bg="#eee")
         vorschau.pack(expand=TRUE, fill="x", padx=5, side=TOP)
         self.pt.show()
         self.frame2.pack(pady=10, padx=5, fill="both", side=TOP)
@@ -132,6 +132,8 @@ class ImporterGUI:
                 importer.setDataFrame(newDataFrame)
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
+            else:
+                self.deleteAllFiles()
 
         elif files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])

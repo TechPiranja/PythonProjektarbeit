@@ -4,7 +4,7 @@ from importer_GUI import ImporterGUI
 class Main:
     def __init__(self):
         self.root = Tk()
-        self.root.title("Tabelle importieren")
+        self.root.title("Table Importer")
         ImporterGUI(self.root)
         self.root.mainloop()
 

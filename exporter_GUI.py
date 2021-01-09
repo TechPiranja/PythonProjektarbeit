@@ -21,7 +21,7 @@ def prepareExport(folderPathText, fileNameText, importer, dialect, isCSV = True)
 def initExportDialog(root: Tk, importer, dialect):
     importer = importer
     window = Toplevel(root)
-    h1 = Label(window, text="Tabelle exportieren", bg="#eee")
+    h1 = Label(window, text="Table export", bg="#eee")
     h1.pack(padx=5, pady=5, fill="x")
 
     folderFrame = Frame(window)
