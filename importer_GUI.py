@@ -105,6 +105,12 @@ class ImporterGUI:
         exportBtn = Button(root, text="Export", command=self.export, width=20, padx=0)
         exportBtn.pack(fill="x", padx=10, pady=10)
 
+    def openXSLFileDialog(self):
+        file = askopenfilename(parent=self.root, title='Choose a file')
+        self.XMLList.append([self.selectedFiles.get(self.selectedFiles.curselection()), file])
+        self.XSLPath_text.insert(1.0, file)
+        self.updateDf(self.getSelectedFiles())
+
     def openFileDialog(self):
         files = list(askopenfilenames(parent=self.root, title='Choose a file'))
         self.updateSelectedFiles(files)
