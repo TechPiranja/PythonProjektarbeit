@@ -59,6 +59,19 @@ class ImporterGUI:
 
         dialogFrame.pack(fill="x", padx=5)
 
+        # XML XLS Frame
+        h1 = Label(root, text="XSL File", bg="#eee")
+        h1.pack(padx=5, pady=5, fill="x")
+
+        xmlFrame = Frame(root)
+
+        self.importXSL_btn = Button(xmlFrame, state=DISABLED, text="Import XSL File", command=self.openXSLFileDialog, width=20)
+        self.importXSL_btn.grid(row=0, column=0)
+        self.XSLPath_text = Text(xmlFrame, height=1, borderwidth=2, relief=SUNKEN)
+        self.XSLPath_text.grid(row=0, column=1)
+
+        xmlFrame.pack(fill="x", padx=5, pady=5)
+
         # Detector Frame
         h1 = Label(root, text="Detector", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
