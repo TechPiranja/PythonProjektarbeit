@@ -1,9 +1,9 @@
 from lxml import etree
-
+from tkinter import messagebox
 
 def exportToCSV(filePath: str, dataframe, dialect):
-    dataframe.to_csv(filePath + ".csv", encoding=dialect.encoding, sep=dialect.delimiter, quotechar=dialect.quotechar, index=False)
-    #TODO: Message that the File was exported successfully!
+    dataframe.to_csv(filePath + ".csv", encoding=dialect.encoding, sep=dialect.delimiter, quotechar=dialect.quoteChar, index=False)
+    messagebox.showinfo(title="Success!", message="The Export was successful!")
 
 def exportToXML(filePath: str, dataframe, dialect):
     root = etree.Element('items')
