@@ -1,5 +1,5 @@
-from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP, Listbox, SINGLE, Scrollbar, Entry
-from tkinter.filedialog import askopenfilenames
+from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP, Listbox, SINGLE, Scrollbar, DISABLED
+from tkinter.filedialog import askopenfilenames, askopenfilename
 from pandastable import Table, TableModel
 import detector
 import exporter_GUI
@@ -7,7 +7,7 @@ from importer import Importer
 from merger import Merger
 
 importer = Importer()
-merger = Merger()
+merger = Merger(importer)
 
 class ImporterGUI:
     def __init__(self, root: Tk):
@@ -16,6 +16,7 @@ class ImporterGUI:
         self.frame2 = Frame(root)
         self.pt = Table(self.frame2)
         self.dialect = detector.Dialect()
+        self.XMLList = []
 
         h1 = Label(self.root, text="Imported Files", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
@@ -43,8 +44,10 @@ class ImporterGUI:
                     self.importXSL_btn["state"] = "normal"
                     if any(data in x for x in self.XMLList):
                         x = [x for x in self.XMLList if data in x][0]
+                        self.XSLPath_text.delete(1.0, END)
                         self.XSLPath_text.insert(1.0, self.XMLList[self.XMLList.index(x)][1])
                     else:
+                        self.XSLPath_text.delete(1.0, END)
                         self.XSLPath_text.insert(1.0, "please import a XSL File!")
                 else:
                     self.importXSL_btn["state"] = "disabled"
@@ -108,6 +111,7 @@ class ImporterGUI:
     def openXSLFileDialog(self):
         file = askopenfilename(parent=self.root, title='Choose a file')
         self.XMLList.append([self.selectedFiles.get(self.selectedFiles.curselection()), file])
+        self.XSLPath_text.delete(1.0, END)
         self.XSLPath_text.insert(1.0, file)
         self.updateDf(self.getSelectedFiles())
 
@@ -116,15 +120,18 @@ class ImporterGUI:
         self.updateSelectedFiles(files)
         self.updateDf(self.getSelectedFiles())
 
-    #TODO: finish this
     def deleteSelectedFile(self):
         path = self.selectedFiles.get(self.selectedFiles.curselection())
         index = self.selectedFiles.get(0, END).index(path)
         self.selectedFiles.delete(index)
+        if path.endswith(".xml"):
+            x = [x for x in self.XMLList if path in x][0]
+            self.XMLList.pop(self.XMLList.index(x))
         self.updateDf(self.getSelectedFiles())
 
     def deleteAllFiles(self):
         self.selectedFiles.delete(0, END)
+        self.XMLList = []
 
     def getSelectedFiles(self):
         return self.selectedFiles.get(0, END)
@@ -140,38 +147,20 @@ class ImporterGUI:
         exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
     def updateDf(self, files: list):
-        if files[0].endswith(".xml") and files[1].endswith(".xsl"):
-            xmlFile = files[0]
-            xslFile = files[1]
-            importer.importXML(xmlFile, xslFile)
-            self.dialect = importer.dialect
-
-            self.hasHeaderText.delete(1.0, END)
-            self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
-
-            self.seperatorText.delete(1.0, END)
-            self.seperatorText.insert(1.0, self.dialect.delimiter)
-
-            self.quoteCharText.delete(1.0, END)
-            self.quoteCharText.insert(1.0, self.dialect.quotechar)
-            self.encodingText.insert(1.0, "XSLT")
-            updatedDataframe = importer.getDataFrame()
-            self.pt.updateModel(TableModel(updatedDataframe))
-            self.pt.redraw()
-
-        elif len(files) > 1:
+        if len(files) > 1 or len(self.XMLList) > 0:
             #MERGE FILES
-            #TODO: merge xml mit csv
-            canMerge = merger.isMergePossible(files)
+            #TODO: merge xml with csv
+            canMerge = merger.prepareMerge(files, self.XMLList)
             if canMerge:
-                newDataFrame = merger.mergeCSVFiles(files)
+                #mergeFiles doesn't need parameters anymore, because "isMergePossible" sorted the Files inside the class
+                newDataFrame = merger.mergeFiles()
                 importer.setDataFrame(newDataFrame)
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
             else:
                 self.deleteAllFiles()
 
-        elif files[0].endswith(".csv"):
+        elif len(files) > 0 and files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])
 
             importer.importCSV(files[0], self.dialect)
@@ -179,7 +168,6 @@ class ImporterGUI:
             self.pt.updateModel(TableModel(updatedDataframe))
             self.pt.redraw()
 
-            # TODO use CSV Merge Method ( not implemented yet )
             self.encodingText.delete(1.0, END)
             self.encodingText.insert(1.0, self.dialect.encoding)
 
