@@ -25,7 +25,7 @@ class ImporterGUI:
         dialogFrame.grid_columnconfigure(1, weight=1)
         open_btn = Button(dialogFrame, text="Import Files", command=self.openFileDialog, width=20)
         open_btn.grid(row=0, column=0)
-        open_btn = Button(dialogFrame, text="Delete selected File", command=self.deleteSelectedFile(), width=20)
+        open_btn = Button(dialogFrame, text="Delete selected File", command=self.deleteSelectedFile, width=20)
         open_btn.grid(row=1, column=0)
         deleteAll_btn = Button(dialogFrame, text="Delete all", command=self.deleteAllFiles, width=20)
         deleteAll_btn.grid(row=2, column=0)
@@ -77,11 +77,15 @@ class ImporterGUI:
 
     def openFileDialog(self):
         files = list(askopenfilenames(parent=self.root, title='Choose a file'))
-        self.updateDf(files)
+        self.updateSelectedFiles(files)
+        self.updateDf(self.getSelectedFiles())
 
     #TODO: finish this
     def deleteSelectedFile(self):
-        self.selectedFiles.delete(0, END)
+        path = self.selectedFiles.get(self.selectedFiles.curselection())
+        index = self.selectedFiles.get(0, END).index(path)
+        self.selectedFiles.delete(index)
+        self.updateDf(self.getSelectedFiles())
 
     def deleteAllFiles(self):
         self.selectedFiles.delete(0, END)
@@ -90,9 +94,9 @@ class ImporterGUI:
         return self.selectedFiles.get(0, END)
 
     def updateSelectedFiles(self, files):
-        self.deleteAllFiles()
+        startIndex = self.selectedFiles.size()
         for index, file in enumerate(files):
-            self.selectedFiles.insert(index, file)
+            self.selectedFiles.insert(index + startIndex, file)
 
     def export(self):
         #get updated df if changes where made in the pandastable
@@ -101,7 +105,6 @@ class ImporterGUI:
 
     def updateDf(self, files: list):
         if files[0].endswith(".xml") and files[1].endswith(".xsl"):
-            self.updateSelectedFiles(files)
             xmlFile = files[0]
             xslFile = files[1]
             importer.importXML(xmlFile, xslFile)
@@ -125,7 +128,6 @@ class ImporterGUI:
             #TODO: merge xml mit csv
             canMerge = merger.isMergePossible(files)
             if canMerge:
-                self.updateSelectedFiles(files)
                 newDataFrame = merger.mergeCSVFiles(files)
                 importer.setDataFrame(newDataFrame)
                 self.pt.updateModel(TableModel(newDataFrame))
@@ -140,8 +142,6 @@ class ImporterGUI:
             self.pt.redraw()
 
             # TODO use CSV Merge Method ( not implemented yet )
-            self.updateSelectedFiles(files)
-
             self.encodingText.delete(1.0, END)
             self.encodingText.insert(1.0, self.dialect.encoding)
 
@@ -153,4 +153,3 @@ class ImporterGUI:
 
             self.quoteCharText.delete(1.0, END)
             self.quoteCharText.insert(1.0, self.dialect.quotechar)
-
