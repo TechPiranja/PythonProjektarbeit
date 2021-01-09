@@ -35,6 +35,23 @@ class ImporterGUI:
 
         self.selectedFiles = Listbox(listbox_border, selectmode=SINGLE, height=4, borderwidth=0, highlightthickness=0, relief=SUNKEN, background="white")
 
+        def selectionChanged(event):
+            selection = event.widget.curselection()
+            if selection:
+                data = event.widget.get(selection[0])
+                if data.endswith(".xml"):
+                    self.importXSL_btn["state"] = "normal"
+                    if any(data in x for x in self.XMLList):
+                        x = [x for x in self.XMLList if data in x][0]
+                        self.XSLPath_text.insert(1.0, self.XMLList[self.XMLList.index(x)][1])
+                    else:
+                        self.XSLPath_text.insert(1.0, "please import a XSL File!")
+                else:
+                    self.importXSL_btn["state"] = "disabled"
+                    self.XSLPath_text.delete(1.0, END)
+
+        self.selectedFiles.bind("<<ListboxSelect>>", selectionChanged)
+
         vsb = Scrollbar(listbox_border, orient="vertical", command=self.selectedFiles.yview)
         self.selectedFiles.configure(yscrollcommand=vsb)
         vsb.pack(side="right", fill="y")
