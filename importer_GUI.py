@@ -149,12 +149,12 @@ class ImporterGUI:
     def updateDf(self, files: list):
         if len(files) > 1 or len(self.XMLList) > 0:
             #MERGE FILES
-            #TODO: merge xml with csv
             canMerge = merger.prepareMerge(files, self.XMLList)
             if canMerge:
                 #mergeFiles doesn't need parameters anymore, because "isMergePossible" sorted the Files inside the class
                 newDataFrame = merger.mergeFiles()
                 importer.setDataFrame(newDataFrame)
+                self.dialect = importer.dialect
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
             else:
