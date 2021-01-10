@@ -159,23 +159,21 @@ class ImporterGUI:
                 self.pt.redraw()
             else:
                 self.deleteAllFiles()
-
         elif len(files) > 0 and files[0].endswith(".csv"):
             self.dialect.guessDialectCSV(files[0])
-
             importer.importCSV(files[0], self.dialect)
             updatedDataframe = importer.getDataFrame()
             self.pt.updateModel(TableModel(updatedDataframe))
             self.pt.redraw()
 
-            self.encodingText.delete(1.0, END)
-            self.encodingText.insert(1.0, self.dialect.encoding)
+        self.encodingText.delete(1.0, END)
+        self.encodingText.insert(1.0, self.dialect.encoding)
 
-            self.hasHeaderText.delete(1.0, END)
-            self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+        self.hasHeaderText.delete(1.0, END)
+        self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
 
-            self.seperatorText.delete(1.0, END)
-            self.seperatorText.insert(1.0, self.dialect.delimiter)
+        self.seperatorText.delete(1.0, END)
+        self.seperatorText.insert(1.0, self.dialect.delimiter)
 
-            self.quoteCharText.delete(1.0, END)
-            self.quoteCharText.insert(1.0, self.dialect.quotechar)
+        self.quoteCharText.delete(1.0, END)
+        self.quoteCharText.insert(1.0, self.dialect.quoteChar)
