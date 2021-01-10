@@ -16,9 +16,6 @@ class Merger:
 
     def convertToCSV(self, xmlFile, xslFile):
         self.importer.importXML(xmlFile, xslFile)
-        self.dialect = self.importer.dialect
-
-        updatedDataframe = self.importer.getDataFrame()
 
     def prepareMerge(self, files: list, xmlList: list):
         # TODO: also get header if there is none! and merge them if possible
@@ -38,18 +35,21 @@ class Merger:
         return isMatching
 
     def mergeFiles(self):
+        mergedDf = pd.DataFrame
         if len(self.csvFiles) > 0 and len(self.xmlList) > 0:
             mergedCSVDf = self.mergeCSVFiles(self.csvFiles)
             mergedXMLDf = self.mergeXMLList(self.xmlList)
-            return pd.concat([mergedCSVDf, mergedXMLDf])
+            mergedDf = pd.concat([mergedCSVDf, mergedXMLDf])
         elif len(self.csvFiles) > 0:
-            return self.mergeCSVFiles(self.csvFiles)
+            mergedDf = self.mergeCSVFiles(self.csvFiles)
         elif len(self.xmlList) > 0:
-            return self.mergeXMLList(self.xmlList)
+            mergedDf = self.mergeXMLList(self.xmlList)
 
         #clear sorted list
         self.xmlList = []
         self.csvFiles = []
+
+        return mergedDf
 
     def mergeCSVFiles(self, files: list):
         mergedDf = pd.read_csv(files[0])
