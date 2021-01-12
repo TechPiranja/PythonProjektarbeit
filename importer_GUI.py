@@ -154,6 +154,7 @@ class ImporterGUI:
                 #mergeFiles doesn't need parameters anymore, because "isMergePossible" sorted the Files inside the class
                 newDataFrame = merger.mergeFiles()
                 importer.setDataFrame(newDataFrame)
+                #TODO: save dialect for each imported file, change on click!
                 self.dialect = importer.dialect
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
