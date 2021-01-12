@@ -35,54 +35,35 @@ class ImporterGUI:
         Button(dialogFrame, text="Delete selected File", command=self.deleteSelectedFile, width=20).grid(row=1, column=0)
         Button(dialogFrame, text="Delete all", command=self.deleteAllFiles, width=20).grid(row=2, column=0)
 
+        # the outside frame for the files listbox (it holds the listbox and the scrollbar)
         listbox_border = Frame(dialogFrame, bd=2, relief="sunken", background="white")
         listbox_border.grid(row=0, column=1, rowspan=3, padx=3, sticky="nsew")
 
+        # the actual listbox
         self.selectedFiles = Listbox(listbox_border, selectmode=SINGLE, height=4, borderwidth=0, highlightthickness=0, relief=SUNKEN, background="white")
+        self.selectedFiles.bind("<<ListboxSelect>>", self.selectionChanged)
 
-        def selectionChanged(event):
-            selection = event.widget.curselection()
-            if selection:
-                data = event.widget.get(selection[0])
-                if data.endswith(".xml"):
-                    self.importXSL_btn["state"] = "normal"
-                    if any(data in x for x in self.XMLList):
-                        x = [x for x in self.XMLList if data in x][0]
-                        self.XSLPath_text.delete(1.0, END)
-                        self.XSLPath_text.insert(1.0, self.XMLList[self.XMLList.index(x)][1])
-                    else:
-                        self.XSLPath_text.delete(1.0, END)
-                        self.XSLPath_text.insert(1.0, "please import a XSL File!")
-                else:
-                    self.importXSL_btn["state"] = "disabled"
-                    self.XSLPath_text.delete(1.0, END)
-
-        self.selectedFiles.bind("<<ListboxSelect>>", selectionChanged)
-
+        # the scrollbar inside the listbox_border frame
         vsb = Scrollbar(listbox_border, orient="vertical", command=self.selectedFiles.yview)
         self.selectedFiles.configure(yscrollcommand=vsb)
         vsb.pack(side="right", fill="y")
         self.selectedFiles.pack(padx=2, pady=2, fill="both", expand=True)
-
         dialogFrame.pack(fill="x", padx=5)
 
-        # XML XLS Frame
+        # XSL File Frame (its disabled when a csv file is selected in the listbox,
+        # and set to "normal" when a xml is selected
         h1 = Label(root, text="XSL File", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
-
-        xmlFrame = Frame(root)
-
-        self.importXSL_btn = Button(xmlFrame, state=DISABLED, text="Import XSL File", command=self.openXSLFileDialog, width=20)
+        xslFrame = Frame(root)
+        self.importXSL_btn = Button(xslFrame, state=DISABLED, text="Import XSL File", command=self.openXSLFileDialog, width=20)
         self.importXSL_btn.grid(row=0, column=0)
-        self.XSLPath_text = Text(xmlFrame, height=1, borderwidth=2, relief=SUNKEN)
+        self.XSLPath_text = Text(xslFrame, height=1, borderwidth=2, relief=SUNKEN)
         self.XSLPath_text.grid(row=0, column=1)
-
-        xmlFrame.pack(fill="x", padx=5, pady=5)
+        xslFrame.pack(fill="x", padx=5, pady=5)
 
         # Detector Frame
         h1 = Label(root, text="Detector", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
-
         detectorFrame = Frame(root)
 
         Label(detectorFrame, text="Encoding:", width=20, anchor="w", justify="left", padx=0).grid(row=0, column=0)
@@ -103,16 +84,45 @@ class ImporterGUI:
 
         detectorFrame.pack(fill="x", padx=5, pady=5)
 
-        # Vorschau und Pandastable
-        vorschau = Label(root, text="Preview", bg="#eee")
-        vorschau.pack(expand=TRUE, fill="x", padx=5, side=TOP)
+        # dataframe preview frame
+        preview = Label(root, text="Preview", bg="#eee")
+        preview.pack(expand=TRUE, fill="x", padx=5, side=TOP)
         self.pt.show()
         self.previewFrame.pack(pady=10, padx=5, fill="both", side=TOP)
 
+        # the bottom most centered export button which leads to the export window
         exportBtn = Button(root, text="Export", command=self.export, width=20, padx=0)
         exportBtn.pack(fill="x", padx=10, pady=10)
 
+    def selectionChanged(self, event):
+        """
+        this is an event which is triggered by selection changed inside the listbox widget
+        it checks if the selected file is a xml, if so it sets the textbox intractable for the user
+
+        :param event: the event which called it
+        """
+        selection = event.widget.curselection()
+        if selection:
+            data = event.widget.get(selection[0])
+            if data.endswith(".xml"):
+                self.importXSL_btn["state"] = "normal"
+                if any(data in x for x in self.XMLList):
+                    x = [x for x in self.XMLList if data in x][0]
+                    self.XSLPath_text.delete(1.0, END)
+                    self.XSLPath_text.insert(1.0, self.XMLList[self.XMLList.index(x)][1])
+                else:
+                    self.XSLPath_text.delete(1.0, END)
+                    self.XSLPath_text.insert(1.0, "please import a XSL File!")
+            else:
+                self.importXSL_btn["state"] = "disabled"
+                self.XSLPath_text.delete(1.0, END)
+
     def openXSLFileDialog(self):
+        """
+        this function is called if the user wants to import a xsl file in the xsl file frame
+        it opens the filedialog and appends the xsl to the according xml into the XMLList attribute
+        after that, it try's to update the dataframe and its preview by calling the update function
+        """
         file = askopenfilename(parent=self.root, title='Choose a file')
         self.XMLList.append([self.selectedFiles.get(self.selectedFiles.curselection()), file])
         self.XSLPath_text.delete(1.0, END)
@@ -120,11 +130,19 @@ class ImporterGUI:
         self.updateDf(self.getSelectedFiles())
 
     def openFileDialog(self):
+        """
+        this function opens the file dialog and imports the selected filepaths into the listbox and also
+        calls the update function to redraw the new dataframe
+        """
         files = list(askopenfilenames(parent=self.root, title='Choose a file'))
         self.updateSelectedFiles(files)
         self.updateDf(self.getSelectedFiles())
 
     def deleteSelectedFile(self):
+        """
+        deletes the selected file from the listbox and redraws the dataframe since one of its source is deleted
+        also if a xml file is deleted, it also deletes the corresponding xsl file from the XMLList
+        """
         path = self.selectedFiles.get(self.selectedFiles.curselection())
         index = self.selectedFiles.get(0, END).index(path)
         self.selectedFiles.delete(index)
@@ -134,28 +152,46 @@ class ImporterGUI:
         self.updateDf(self.getSelectedFiles())
 
     def deleteAllFiles(self):
+        """
+        deletes all imported filepaths from the listbox and also from the dataframe
+        """
         self.selectedFiles.delete(0, END)
         self.XMLList = []
 
     def getSelectedFiles(self):
+        """
+        :return: returns the selected filepath from the listbox
+        """
         return self.selectedFiles.get(0, END)
 
     def updateSelectedFiles(self, files):
+        """
+        after opening a file dialog, this method is called to pass the new imported filepaths into the listbox
+
+        :param files: filespaths from the filedialog
+        """
         startIndex = self.selectedFiles.size()
         for index, file in enumerate(files):
             self.selectedFiles.insert(index + startIndex, file)
 
     def export(self):
-        #get updated df if changes where made in the pandastable
+        """
+        opens the export window and passes the dataframe from the preview frame
+        """
         importer.setDataFrame(self.pt.model.df)
         exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
     def updateDf(self, files: list):
+        """
+        checks if the dataframe can be updated by the newly imported filepaths
+        calls the merge function if there is more than 1 file inside the filelist
+        also udpates the detector frame (displaying dialect data)
+
+        :param files: the whole filepath list
+        """
         if len(files) > 1 or len(self.XMLList) > 0:
-            #MERGE FILES
             canMerge = merger.prepareMerge(files, self.XMLList)
             if canMerge:
-                #mergeFiles doesn't need parameters anymore, because "isMergePossible" sorted the Files inside the class
                 newDataFrame = merger.mergeFiles()
                 importer.setDataFrame(newDataFrame)
                 #TODO: save dialect for each imported file, change on click!
@@ -171,6 +207,7 @@ class ImporterGUI:
             self.pt.updateModel(TableModel(updatedDataframe))
             self.pt.redraw()
 
+        # updates the dialect data
         self.encodingText.delete(1.0, END)
         self.encodingText.insert(1.0, self.dialect.encoding)
 
