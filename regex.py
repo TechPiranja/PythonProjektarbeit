@@ -9,6 +9,12 @@ reUrl = re.compile(r"^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))
 
 
 def getHeaderName(sample: str):
+    """
+    checks the sample with a regex match and returns it type
+
+    :param sample: the sample from a csv cell
+    :return: sample type
+    """
     if reEmail.match(sample):
         return "Email"
 
