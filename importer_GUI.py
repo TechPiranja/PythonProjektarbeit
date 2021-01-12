@@ -10,11 +10,18 @@ importer = Importer()
 merger = Merger(importer)
 
 class ImporterGUI:
+    """
+    This class is the main gui and shows the import window, it also contains the main methods which uses other helper classes
+
+    Attributes:
+        root = the root tk
+        previewFrame = the frame that shows the preview of the dataframe
+        XMLList = the 2D list which holds the xml filepath on the index 0 and the xsl filepath on index 1
+    """
     def __init__(self, root: Tk):
         self.root = root
-        self.frame1 = Frame(root)
-        self.frame2 = Frame(root)
-        self.pt = Table(self.frame2)
+        self.previewFrame = Frame(root)
+        self.pt = Table(self.previewFrame)
         self.dialect = detector.Dialect()
         self.XMLList = []
 
@@ -24,12 +31,9 @@ class ImporterGUI:
         # Dialog Frame
         dialogFrame = Frame(self.root)
         dialogFrame.grid_columnconfigure(1, weight=1)
-        open_btn = Button(dialogFrame, text="Import Files", command=self.openFileDialog, width=20)
-        open_btn.grid(row=0, column=0)
-        open_btn = Button(dialogFrame, text="Delete selected File", command=self.deleteSelectedFile, width=20)
-        open_btn.grid(row=1, column=0)
-        deleteAll_btn = Button(dialogFrame, text="Delete all", command=self.deleteAllFiles, width=20)
-        deleteAll_btn.grid(row=2, column=0)
+        Button(dialogFrame, text="Import Files", command=self.openFileDialog, width=20).grid(row=0, column=0)
+        Button(dialogFrame, text="Delete selected File", command=self.deleteSelectedFile, width=20).grid(row=1, column=0)
+        Button(dialogFrame, text="Delete all", command=self.deleteAllFiles, width=20).grid(row=2, column=0)
 
         listbox_border = Frame(dialogFrame, bd=2, relief="sunken", background="white")
         listbox_border.grid(row=0, column=1, rowspan=3, padx=3, sticky="nsew")
@@ -103,7 +107,7 @@ class ImporterGUI:
         vorschau = Label(root, text="Preview", bg="#eee")
         vorschau.pack(expand=TRUE, fill="x", padx=5, side=TOP)
         self.pt.show()
-        self.frame2.pack(pady=10, padx=5, fill="both", side=TOP)
+        self.previewFrame.pack(pady=10, padx=5, fill="both", side=TOP)
 
         exportBtn = Button(root, text="Export", command=self.export, width=20, padx=0)
         exportBtn.pack(fill="x", padx=10, pady=10)

@@ -10,7 +10,7 @@ class Dialect:
     check its header, and fill the header with correct header names if there is none.
 
     Attributes:
-         encoding: pre-defined default encoding
+        encoding: pre-defined default encoding
         hasHeader: pre-defined default hasHeader
         delimiter: pre-defined default delimiter
         quoteChar: pre-defined default quoteChar
