@@ -8,3 +8,9 @@ __pycache__/
 testFiles/
 
 venv/
+
+Doxyfile
+
+html/
+
+latex/
