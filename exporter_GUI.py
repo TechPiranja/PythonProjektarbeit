@@ -1,5 +1,5 @@
 from functools import partial
-from tkinter import END, Tk, Toplevel, Label, Frame, Text, SUNKEN, Button
+from tkinter import END, Tk, Toplevel, Label, Frame, Text, SUNKEN, Button, BooleanVar, Checkbutton
 from tkinter.filedialog import askdirectory
 import exporter
 
@@ -46,6 +46,7 @@ def initExportDialog(root: Tk, importer, dialect):
     """
     importer = importer
     window = Toplevel(root)
+    hasHeaderVar = BooleanVar()
 
     h1 = Label(window, text="Table export", bg="#eee")
     h1.pack(padx=5, pady=5, fill="x")
@@ -61,9 +62,51 @@ def initExportDialog(root: Tk, importer, dialect):
     fileNameText = Text(folderFrame, height=1, borderwidth=2, relief=SUNKEN)
     fileNameText.grid(row=1, column=1)
     fileNameText.insert(1.0, "filename")
-
-    exportCSVBtn = Button(folderFrame, text="Export to CSV", command=partial(prepareExport, folderPathText, fileNameText, importer, dialect), width=20, padx=0)
-    exportCSVBtn.grid(row=2, column=0)
-    exportXMLBtn = Button(folderFrame, text="Export to XML", command=partial(prepareExport, folderPathText, fileNameText, importer, dialect, False), width=20, padx=0, anchor="e")
-    exportXMLBtn.grid(row=2, column=1)
     folderFrame.pack(padx=5)
+
+    # Dialect Frame
+    dialectFrame = Frame(window)
+    dialectFrame.grid_columnconfigure(0, weight=1)
+    dialectFrame.grid_columnconfigure(1, weight=1)
+    csvFrame = Frame(dialectFrame, borderwidth=1, relief="sunken")
+    xmlFrame = Frame(dialectFrame, borderwidth=1, relief="sunken")
+
+    h1 = Label(window, text="Export Options", bg="#eee")
+    h1.pack(padx=5, pady=5, fill="x")
+
+    # csv Frame
+    Label(csvFrame, text="Encoding:", width=20, anchor="w", justify="left", padx=5, pady=5).grid(row=0)
+    encodingCSVText = Text(csvFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
+    encodingCSVText.grid(row=0, column=1)
+
+    Label(csvFrame, text="Has Header:", width=20, anchor="w", justify="left").grid(row=1)
+    hasHeaderCheckbutton = Checkbutton(csvFrame, var=hasHeaderVar, onvalue=1, offvalue=0)
+    hasHeaderCheckbutton.grid(sticky="w", row=1, column=1)
+
+    Label(csvFrame, text="Seperator:", width=20, anchor="w", justify="left").grid(row=2)
+    seperatorText = Text(csvFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
+    seperatorText.grid(row=2, column=1)
+
+    Label(csvFrame, text="Quote Char:", width=20, anchor="w", justify="left", pady=5).grid(row=3)
+    quoteCharText = Text(csvFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
+    quoteCharText.grid(row=3, column=1)
+    csvFrame.grid(column=0, row=0, padx=5, sticky="nsew")
+
+    # xml Frame
+    Label(xmlFrame, text="Encoding:", width=20, anchor="w", justify="left", padx=5, pady=5).grid(column=0, row=0)
+    encodingXMLText = Text(xmlFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
+    encodingXMLText.grid(row=0, column=1)
+    xmlFrame.grid(column=1, row=0, rowspan=4, padx=5, sticky="nsew")
+
+    dialectFrame.pack(padx=5, pady=5, fill="x")
+
+    # Button Frame
+    buttonFrame = Frame(window)
+    buttonFrame.grid_columnconfigure(0, weight=1)
+    buttonFrame.grid_columnconfigure(1, weight=1)
+
+    Button(buttonFrame, text="Export to CSV", command=partial(prepareExport, folderPathText, fileNameText, importer,
+           dialect), width=20, padx=10, anchor="center").grid(column=0, row=0)
+    Button(buttonFrame, text="Export to XML", command=partial(prepareExport, folderPathText, fileNameText, importer,
+           dialect, False), width=20, padx=10).grid(column=1, row=0)
+    buttonFrame.pack(padx=5, fill="x", pady=10)
