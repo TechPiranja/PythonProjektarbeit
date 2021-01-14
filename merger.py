@@ -45,15 +45,12 @@ class Merger:
         :param xmlList: the xml List which contains its corresponding xsl file
         :return: boolean if the headers of the given files are matching and allowed to be merged
         """
-        # TODO: also get header if there is none! and merge them if possible
         self.xmlList = xmlList
 
         # sort files
         for file in files:
             if file.endswith(".csv"):
                 self.csvFiles.append(file)
-
-        #TODO: check if xml and csv can be merged
 
         isMatching = self.checkMatchingHeaderCSV(self.csvFiles)
         if isMatching is False:

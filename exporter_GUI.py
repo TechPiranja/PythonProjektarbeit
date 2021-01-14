@@ -103,7 +103,6 @@ class ExporterGUI:
         """
         opens the folder dialog for the desired export destination
 
-        :param window: the window root
         :param folderPathText: the folderPath text widget
         """
         files = askdirectory(parent=self.window, title='Choose a file')
@@ -116,8 +115,6 @@ class ExporterGUI:
 
         :param folderPathText: the folderpath destination
         :param fileNameText: the choosen filename for the export
-        :param importer: the importer class (singelton)
-        :param dialect: the dialect for the export method
         :param isCSV: boolean if the dataframe should be exported into csv or xml
         """
         dataframe = self.importer.getDataFrame()

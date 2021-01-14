@@ -181,7 +181,6 @@ class ImporterGUI:
         """
         importer.setDataFrame(self.pt.model.df)
         ExporterGUI(self.root, importer, self.dialect)
-        #exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
     def updateDf(self, files: list):
         """
@@ -196,7 +195,6 @@ class ImporterGUI:
             if canMerge:
                 newDataFrame = merger.mergeFiles()
                 importer.setDataFrame(newDataFrame)
-                #TODO: save dialect for each imported file, change on click!
                 self.dialect = importer.dialect
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
