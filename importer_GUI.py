@@ -1,4 +1,4 @@
-from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP, Listbox, SINGLE, Scrollbar, DISABLED
+from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP, Listbox, SINGLE, Scrollbar, DISABLED, Checkbutton, BooleanVar
 from tkinter.filedialog import askopenfilenames, askopenfilename
 from pandastable import Table, TableModel
 import detector
@@ -24,6 +24,7 @@ class ImporterGUI:
         self.pt = Table(self.previewFrame)
         self.dialect = detector.Dialect()
         self.XMLList = []
+        self.hasHeaderVar = BooleanVar()
 
         h1 = Label(self.root, text="Imported Files", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
@@ -48,7 +49,7 @@ class ImporterGUI:
         self.selectedFiles.configure(yscrollcommand=vsb)
         vsb.pack(side="right", fill="y")
         self.selectedFiles.pack(padx=2, pady=2, fill="both", expand=True)
-        dialogFrame.pack(fill="x", padx=5)
+        dialogFrame.pack(fill="x", padx=10)
 
         # XSL File Frame (its disabled when a csv file is selected in the listbox,
         # and set to "normal" when a xml is selected
@@ -59,36 +60,36 @@ class ImporterGUI:
         self.importXSL_btn.grid(row=0, column=0)
         self.XSLPath_text = Text(xslFrame, height=1, borderwidth=2, relief=SUNKEN)
         self.XSLPath_text.grid(row=0, column=1)
-        xslFrame.pack(fill="x", padx=5, pady=5)
+        xslFrame.pack(fill="x", padx=10, pady=5)
 
         # Detector Frame
         h1 = Label(root, text="Detector", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
         detectorFrame = Frame(root)
 
-        Label(detectorFrame, text="Encoding:", width=20, anchor="w", justify="left", padx=0).grid(row=0, column=0)
-        self.encodingText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
+        Label(detectorFrame, text="Encoding:", width=20, anchor="w", justify="left").grid(row=0)
+        self.encodingText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
         self.encodingText.grid(row=0, column=1)
 
-        Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left", padx=0).grid(row=1, column=0)
-        self.hasHeaderText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
-        self.hasHeaderText.grid(row=1, column=1)
+        Label(detectorFrame, text="Has Header:", width=20, anchor="w", justify="left").grid(row=1)
+        self.hasHeaderCheckbutton = Checkbutton(detectorFrame, var=self.hasHeaderVar, onvalue=1, offvalue=0)
+        self.hasHeaderCheckbutton.grid(sticky="W", row=1, column=1)
 
-        Label(detectorFrame, text="Seperator:", width=20, anchor="w", justify="left", padx=0).grid(row=2, column=0)
-        self.seperatorText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
+        Label(detectorFrame, text="Seperator:", width=20, anchor="w", justify="left").grid(row=2)
+        self.seperatorText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
         self.seperatorText.grid(row=2, column=1)
 
-        Label(detectorFrame, text="Quote Char:", width=20, anchor="w", justify="left", padx=0).grid(row=3, column=0)
-        self.quoteCharText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN)
+        Label(detectorFrame, text="Quote Char:", width=20, anchor="w", justify="left").grid(row=3)
+        self.quoteCharText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
         self.quoteCharText.grid(row=3, column=1)
 
-        detectorFrame.pack(fill="x", padx=5, pady=5)
+        detectorFrame.pack(fill="x", padx=10, pady=5)
 
         # dataframe preview frame
         preview = Label(root, text="Preview", bg="#eee")
         preview.pack(expand=TRUE, fill="x", padx=5, side=TOP)
         self.pt.show()
-        self.previewFrame.pack(pady=10, padx=5, fill="both", side=TOP)
+        self.previewFrame.pack(pady=10, padx=10, fill="both", side=TOP)
 
         # the bottom most centered export button which leads to the export window
         exportBtn = Button(root, text="Export", command=self.export, width=20, padx=0)
@@ -211,8 +212,7 @@ class ImporterGUI:
         self.encodingText.delete(1.0, END)
         self.encodingText.insert(1.0, self.dialect.encoding)
 
-        self.hasHeaderText.delete(1.0, END)
-        self.hasHeaderText.insert(1.0, self.dialect.hasHeader)
+        self.hasHeaderVar.set(self.dialect.hasHeader)
 
         self.seperatorText.delete(1.0, END)
         self.seperatorText.insert(1.0, self.dialect.delimiter)
