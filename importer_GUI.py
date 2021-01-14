@@ -2,7 +2,7 @@ from tkinter import END, Tk, Label, Frame, Text, SUNKEN, Button, TRUE, TOP, List
 from tkinter.filedialog import askopenfilenames, askopenfilename
 from pandastable import Table, TableModel
 import detector
-import exporter_GUI
+from exporter_GUI import ExporterGUI
 from importer import Importer
 from merger import Merger
 
@@ -180,7 +180,8 @@ class ImporterGUI:
         opens the export window and passes the dataframe from the preview frame
         """
         importer.setDataFrame(self.pt.model.df)
-        exporter_GUI.initExportDialog(self.root, importer, self.dialect)
+        ExporterGUI(self.root, importer, self.dialect)
+        #exporter_GUI.initExportDialog(self.root, importer, self.dialect)
 
     def updateDf(self, files: list):
         """
