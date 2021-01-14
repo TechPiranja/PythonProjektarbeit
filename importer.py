@@ -54,7 +54,8 @@ class Importer:
         imports a csv file or a buffer and saves it into the importer class dataframe attribute
         It also guesses HeaderNames if the dataframe hase none
         """
-        self.dataFrame = pd.read_csv(file, sep=dialect.delimiter, quotechar=dialect.quotechar, encoding=dialect.encoding)
+        self.dataFrame = pd.read_csv(file, sep=dialect.delimiter, quotechar=dialect.quotechar, encoding=dialect.encoding
+                                     , error_bad_lines=False, engine='python')
 
         if dialect.hasHeader is False:
             headers = detector.guessHeaderNames(self.dataFrame)
