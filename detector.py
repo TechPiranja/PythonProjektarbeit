@@ -40,6 +40,7 @@ class Dialect:
 
         :param data: the data from the read etree.pass method
         """
+        self.encoding = "utf-8"
         self.quotechar = self.getSniffer(data).quotechar
         self.delimiter = self.getSniffer(data).delimiter
         self.hasHeader = self.checkHasHeader(data)
