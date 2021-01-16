@@ -1,6 +1,7 @@
 from lxml import etree
 from tkinter import messagebox
 
+
 def exportToCSV(filePath: str, dataframe, dialect):
     """
     Helper method which exports the dataframe from the importer_gui preview into a csv file with the given dialect.
@@ -9,8 +10,10 @@ def exportToCSV(filePath: str, dataframe, dialect):
     :param dataframe: the dataframe from the importer_gui preview which will be converted into a csv file
     :param dialect: the dialect which will be used to convert the dataframe into a csv file
     """
-    dataframe.to_csv(filePath + ".csv", encoding=dialect.encoding, sep=dialect.delimiter, quotechar=dialect.quoteChar, index=False)
+    dataframe.to_csv(filePath + ".csv", encoding=dialect.encoding, sep=dialect.delimiter, quotechar=dialect.quoteChar,
+                     index=False)
     messagebox.showinfo(title="Success!", message="The Export was successful!")
+
 
 def exportToXML(filePath: str, dataframe, encoding):
     """
