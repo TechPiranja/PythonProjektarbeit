@@ -9,6 +9,7 @@ from merger import Merger
 importer = Importer()
 merger = Merger(importer)
 
+
 class ImporterGUI:
     """
     This class is the main gui and shows the import window, it also contains the main methods which uses other helper classes
@@ -24,7 +25,9 @@ class ImporterGUI:
         self.pt = Table(self.previewFrame)
         self.dialect = detector.Dialect()
         self.XMLList = []
+        self.DialectList = []
         self.hasHeaderVar = BooleanVar()
+        self.currentPath = ""
 
         h1 = Label(self.root, text="Imported Files", bg="#eee")
         h1.pack(padx=5, pady=5, fill="x")
@@ -41,14 +44,14 @@ class ImporterGUI:
         listbox_border.grid(row=0, column=1, rowspan=3, padx=3, sticky="nsew")
 
         # the actual listbox
-        self.selectedFiles = Listbox(listbox_border, selectmode=SINGLE, height=4, borderwidth=0, highlightthickness=0, relief=SUNKEN, background="white")
-        self.selectedFiles.bind("<<ListboxSelect>>", self.selectionChanged)
+        self.importedFiles = Listbox(listbox_border, selectmode=SINGLE, height=4, borderwidth=0, highlightthickness=0, relief=SUNKEN, background="white")
+        self.importedFiles.bind("<<ListboxSelect>>", self.selectionChanged)
 
         # the scrollbar inside the listbox_border frame
-        vsb = Scrollbar(listbox_border, orient="vertical", command=self.selectedFiles.yview)
-        self.selectedFiles.configure(yscrollcommand=vsb)
+        vsb = Scrollbar(listbox_border, orient="vertical", command=self.importedFiles.yview)
+        self.importedFiles.configure(yscrollcommand=vsb)
         vsb.pack(side="right", fill="y")
-        self.selectedFiles.pack(padx=2, pady=2, fill="both", expand=True)
+        self.importedFiles.pack(padx=2, pady=2, fill="both", expand=True)
         dialogFrame.pack(fill="x", padx=10)
 
         # XSL File Frame (its disabled when a csv file is selected in the listbox,
@@ -83,6 +86,8 @@ class ImporterGUI:
         self.quoteCharText = Text(detectorFrame, height=1, borderwidth=2, relief=SUNKEN, width=10)
         self.quoteCharText.grid(row=3, column=1)
 
+        Button(detectorFrame, text="Save Dialect Changes", command=self.saveDialectChanges, width=20).grid(row=4, column=0)
+
         detectorFrame.pack(fill="x", padx=10, pady=5)
 
         # dataframe preview frame
@@ -95,6 +100,27 @@ class ImporterGUI:
         exportBtn = Button(root, text="Export", command=self.export, width=20, padx=0)
         exportBtn.pack(fill="x", padx=10, pady=10)
 
+    def saveDialectChanges(self):
+        """
+        saves the Dialect changes made by the user
+        """
+        dialect = detector.Dialect()
+        dialect.encoding = self.encodingText.get(1.0, 'end-1c')
+        dialect.hasHeader = self.hasHeaderVar.get()
+        dialect.delimiter = self.seperatorText.get(1.0, 'end-1c')
+        dialect.quoteChar = self.quoteCharText.get(1.0, 'end-1c')
+        if not self.currentPath:
+            files = self.getImportedFiles()
+            self.currentPath = files[0]
+        path = self.currentPath
+        print(path)
+        if not any(path in x for x in self.DialectList):
+            self.DialectList.append([path, dialect])
+        elif any(path in x for x in self.DialectList):
+            x = [x for x in self.DialectList if path in x][0]
+            self.DialectList[self.DialectList.index(x)][1] = dialect
+        self.updateDf(self.getImportedFiles())
+
     def selectionChanged(self, event):
         """
         this is an event which is triggered by selection changed inside the listbox widget
@@ -105,8 +131,19 @@ class ImporterGUI:
         selection = event.widget.curselection()
         if selection:
             data = event.widget.get(selection[0])
+            self.currentPath = data
             if data.endswith(".xml"):
+                # disable encoding changes
+                self.encodingText.delete(1.0, END)
+                self.hasHeaderVar.set(False)
+                self.seperatorText.delete(1.0, END)
+                self.quoteCharText.delete(1.0, END)
+                self.encodingText["state"] = "disabled"
+                self.hasHeaderCheckbutton["state"] = "disabled"
+                self.seperatorText["state"] = "disabled"
+                self.quoteCharText["state"] = "disabled"
                 self.importXSL_btn["state"] = "normal"
+
                 if any(data in x for x in self.XMLList):
                     x = [x for x in self.XMLList if data in x][0]
                     self.XSLPath_text.delete(1.0, END)
@@ -115,8 +152,21 @@ class ImporterGUI:
                     self.XSLPath_text.delete(1.0, END)
                     self.XSLPath_text.insert(1.0, "please import a XSL File!")
             else:
+                self.encodingText.delete(1.0, END)
+                self.hasHeaderVar.set(False)
+                self.seperatorText.delete(1.0, END)
+                self.quoteCharText.delete(1.0, END)
+                self.encodingText["state"] = "normal"
+                self.hasHeaderCheckbutton["state"] = "normal"
+                self.seperatorText["state"] = "normal"
+                self.quoteCharText["state"] = "normal"
                 self.importXSL_btn["state"] = "disabled"
                 self.XSLPath_text.delete(1.0, END)
+
+                if any(data in x for x in self.DialectList):
+                    x = [x for x in self.DialectList if data in x][0]
+                    dialect = self.DialectList[self.DialectList.index(x)][1]
+                    self.updateDialect(dialect)
 
     def openXSLFileDialog(self):
         """
@@ -124,46 +174,62 @@ class ImporterGUI:
         it opens the filedialog and appends the xsl to the according xml into the XMLList attribute
         after that, it try's to update the dataframe and its preview by calling the update function
         """
-        file = askopenfilename(parent=self.root, title='Choose a file')
-        self.XMLList.append([self.selectedFiles.get(self.selectedFiles.curselection()), file])
+        file = askopenfilename(parent=self.root, title='Choose a file', filetypes=[
+                ("Extensible Stylesheet Language", "*.xsl"),
+                ("All files", "*.*")
+            ])
+        self.XMLList.append([self.importedFiles.get(self.importedFiles.curselection()), file])
         self.XSLPath_text.delete(1.0, END)
         self.XSLPath_text.insert(1.0, file)
-        self.updateDf(self.getSelectedFiles())
+        self.updateDf(self.getImportedFiles())
 
     def openFileDialog(self):
         """
         this function opens the file dialog and imports the selected filepaths into the listbox and also
         calls the update function to redraw the new dataframe
         """
-        files = list(askopenfilenames(parent=self.root, title='Choose a file'))
+        files = list(askopenfilenames(parent=self.root, title='Choose a file', filetypes=[
+            ("Excel files", ".xml .csv")
+            ]))
         self.updateSelectedFiles(files)
-        self.updateDf(self.getSelectedFiles())
+        self.updateDf(self.getImportedFiles())
 
     def deleteSelectedFile(self):
         """
         deletes the selected file from the listbox and redraws the dataframe since one of its source is deleted
         also if a xml file is deleted, it also deletes the corresponding xsl file from the XMLList
         """
-        path = self.selectedFiles.get(self.selectedFiles.curselection())
-        index = self.selectedFiles.get(0, END).index(path)
-        self.selectedFiles.delete(index)
+        path = self.importedFiles.get(self.importedFiles.curselection())
+        if path is self.currentPath:
+            self.currentPath = ""
+        # delete from dialect list
+        if any(path in x for x in self.DialectList):
+            x = [x for x in self.DialectList if path in x][0]
+            self.DialectList.pop(self.DialectList.index(x))
+
+        index = self.importedFiles.get(0, END).index(path)
+        self.importedFiles.delete(index)
+
+        # delete from xml list
         if path.endswith(".xml"):
             x = [x for x in self.XMLList if path in x][0]
             self.XMLList.pop(self.XMLList.index(x))
-        self.updateDf(self.getSelectedFiles())
+        self.updateDf(self.getImportedFiles())
 
     def deleteAllFiles(self):
         """
         deletes all imported filepaths from the listbox and also from the dataframe
         """
-        self.selectedFiles.delete(0, END)
+        self.importedFiles.delete(0, END)
+        self.currentPath = ""
         self.XMLList = []
+        self.DialectList = []
 
-    def getSelectedFiles(self):
+    def getImportedFiles(self):
         """
         :return: returns the selected filepath from the listbox
         """
-        return self.selectedFiles.get(0, END)
+        return self.importedFiles.get(0, END)
 
     def updateSelectedFiles(self, files):
         """
@@ -171,9 +237,9 @@ class ImporterGUI:
 
         :param files: filespaths from the filedialog
         """
-        startIndex = self.selectedFiles.size()
+        startIndex = self.importedFiles.size()
         for index, file in enumerate(files):
-            self.selectedFiles.insert(index + startIndex, file)
+            self.importedFiles.insert(index + startIndex, file)
 
     def export(self):
         """
@@ -191,30 +257,39 @@ class ImporterGUI:
         :param files: the whole filepath list
         """
         if len(files) > 1 or len(self.XMLList) > 0:
-            canMerge = merger.prepareMerge(files, self.XMLList)
+            canMerge = merger.prepareMerge(files, self.XMLList, self.DialectList)
+            self.DialectList = merger.dialectList
             if canMerge:
                 newDataFrame = merger.mergeFiles()
                 importer.setDataFrame(newDataFrame)
-                self.dialect = importer.dialect
                 self.pt.updateModel(TableModel(newDataFrame))
                 self.pt.redraw()
-            else:
-                self.deleteAllFiles()
         elif len(files) > 0 and files[0].endswith(".csv"):
-            self.dialect.guessDialectCSV(files[0])
+            if not any(files[0] in x for x in self.DialectList):
+                self.dialect.guessDialectCSV(files[0])
+                self.DialectList.append([files[0], self.dialect])
+            else:
+                x = [x for x in self.DialectList if files[0] in x][0]
+                self.dialect = self.DialectList[self.DialectList.index(x)][1]
             importer.importCSV(files[0], self.dialect)
             updatedDataframe = importer.getDataFrame()
             self.pt.updateModel(TableModel(updatedDataframe))
             self.pt.redraw()
+            self.updateDialect(self.dialect)
 
+    def updateDialect(self, dialect: detector.Dialect):
+        """
+        updates the dialect text fields from the gui
+        :param dialect: the new changed dialect
+        """
         # updates the dialect data
         self.encodingText.delete(1.0, END)
-        self.encodingText.insert(1.0, self.dialect.encoding)
+        self.encodingText.insert(1.0, dialect.encoding)
 
-        self.hasHeaderVar.set(self.dialect.hasHeader)
+        self.hasHeaderVar.set(dialect.hasHeader)
 
         self.seperatorText.delete(1.0, END)
-        self.seperatorText.insert(1.0, self.dialect.delimiter)
+        self.seperatorText.insert(1.0, dialect.delimiter)
 
         self.quoteCharText.delete(1.0, END)
-        self.quoteCharText.insert(1.0, self.dialect.quoteChar)
+        self.quoteCharText.insert(1.0, dialect.quoteChar)

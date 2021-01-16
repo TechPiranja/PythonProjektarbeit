@@ -1,6 +1,8 @@
 import csv
 import pandas as pd
 from tkinter import messagebox
+
+import detector
 from importer import Importer
 
 
@@ -17,10 +19,11 @@ class Merger:
     importer = Importer
     csvFiles = []
     xmlList = []
+    dialectList = []
 
     def __init__(self, importer: Importer):
         """
-        The init method of the Merger is importent in order to get the same importer instance (singelton)
+        The init method of the Merger is important in order to get the same importer instance (singelton)
 
         :param importer: the importer object which is also used by the importer_gui
         """
@@ -36,21 +39,31 @@ class Merger:
         """
         self.importer.importXML(xmlFile, xslFile)
 
-    def prepareMerge(self, files: list, xmlList: list):
+    def prepareMerge(self, files: list, xmlList: list, dialectList: list):
         """
         Helper method to prepare a list before merging. It sorts the files so we can identify csv from xml/xsl.
         After that, the headers of all files are checked for matching headers.
 
+        :param dialectList: a dialectList from the import gui
         :param files: the imported file list from the importer_gui
         :param xmlList: the xml List which contains its corresponding xsl file
         :return: boolean if the headers of the given files are matching and allowed to be merged
         """
         self.xmlList = xmlList
+        self.dialectList = dialectList
+        dialect = detector.Dialect()
 
         # sort files
         for file in files:
             if file.endswith(".csv"):
                 self.csvFiles.append(file)
+
+            # adds dialect to dialect list if its not existent already
+            # (only for csv because it doesnt make sense for xml)
+            if not any(file in x for x in self.dialectList):
+                if file.endswith(".csv"):
+                    dialect.guessDialectCSV(file)
+                    self.dialectList.append([file, dialect])
 
         isMatching = self.checkMatchingHeaderCSV(self.csvFiles)
         if isMatching is False:
@@ -75,7 +88,7 @@ class Merger:
         elif len(self.xmlList) > 0:
             mergedDf = self.mergeXMLList(self.xmlList)
 
-        #clears the prepared sorted lists
+        # clears the prepared sorted lists
         self.xmlList = []
         self.csvFiles = []
 
@@ -88,9 +101,16 @@ class Merger:
         :param files: files which will be converted to CSV and merged
         :return: returns merged dataFrame out of the CSV files
         """
-        mergedDf = pd.read_csv(files[0])
+        x = [x for x in self.dialectList if files[0] in x][0]
+        dialect = self.dialectList[self.dialectList.index(x)][1]
+
+        mergedDf = pd.read_csv(files[0], sep=dialect.delimiter, quotechar=dialect.quoteChar, encoding=dialect.encoding
+                               , error_bad_lines=False, engine='python')
         for file in files[1:]:
-            df = pd.read_csv(file)
+            x = [x for x in self.dialectList if file in x][0]
+            dialect = self.dialectList[self.dialectList.index(x)][1]
+            df = pd.read_csv(file, sep=dialect.delimiter, quotechar=dialect.quoteChar, encoding=dialect.encoding
+                             , error_bad_lines=False, engine='python')
             mergedDf = pd.concat([mergedDf, df])
         return mergedDf
 
